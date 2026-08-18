@@ -1,0 +1,174 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@layer base {
+  html, body, #root {
+    font-family: 'Inter', sans-serif;
+    background: #0d0d0d;
+  }
+}
+
+@layer base {
+  * {
+    font-family: sans-serif;
+  }
+}
+
+.container {
+  max-width: 1810px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.open-sans {
+  font-family: 'Open Sans', sans-serif;
+}
+
+@keyframes infinite-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.infinite-track {
+  animation: infinite-scroll 120s linear infinite;
+}
+
+/* ── react-phone-input-2 dark theme overrides ── */
+.gevify-phone-input .react-tel-input {
+  position: relative;
+  width: 100%;
+}
+.gevify-phone-input .react-tel-input .form-control {
+  position: relative;
+  width: 100%;
+  height: auto;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #3f3f46;
+  border-radius: 0;
+  padding: 0 0 0.75rem 48px;
+  margin: 0;
+  color: #d4d4d8;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  letter-spacing: 0.01rem;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.gevify-phone-input .react-tel-input .form-control:focus {
+  border-bottom-color: #0086f0;
+  box-shadow: none;
+}
+.gevify-phone-input .react-tel-input .form-control::placeholder {
+  color: #52525b;
+}
+.gevify-phone-input .react-tel-input .flag-dropdown {
+  position: absolute;
+  top: 0;
+  bottom: auto;
+  left: 0;
+  height: 1.25rem;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+}
+.gevify-phone-input .react-tel-input .flag-dropdown.open {
+  background: transparent;
+  border-radius: 0;
+}
+.gevify-phone-input .react-tel-input .flag-dropdown.open .selected-flag {
+  background: transparent;
+}
+.gevify-phone-input .react-tel-input .selected-flag {
+  outline: none;
+  position: relative;
+  width: 40px;
+  height: 100%;
+  padding: 0 0 0 8px;
+  border-radius: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+}
+.gevify-phone-input .react-tel-input .selected-flag .flag {
+  display: inline-block;
+  flex-shrink: 0;
+}
+.gevify-phone-input .react-tel-input .selected-flag:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+.gevify-phone-input .react-tel-input .country-list {
+  outline: none;
+  z-index: 30;
+  list-style: none;
+  position: absolute;
+  padding: 0;
+  margin: 6px 0 10px -1px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  background: #0d1326;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  width: 300px;
+  max-height: 200px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #333a55 transparent;
+}
+.gevify-phone-input .react-tel-input .country-list .search {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #0d1326;
+  padding: 8px 10px 6px 10px;
+}
+.gevify-phone-input .react-tel-input .country-list .search-box {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 14px;
+  margin-left: 0;
+  padding: 6px 8px 7px;
+  outline: none;
+  background: #0a0f1f;
+  color: #d4d4d8;
+}
+.gevify-phone-input .react-tel-input .country-list .search-box::placeholder {
+  color: #52525b;
+}
+.gevify-phone-input .react-tel-input .country-list .country {
+  padding: 8px 10px;
+  background: transparent;
+  color: #d4d4d8;
+  cursor: pointer;
+}
+.gevify-phone-input .react-tel-input .country-list .country:hover {
+  background: rgba(0, 134, 240, 0.2);
+}
+.gevify-phone-input .react-tel-input .country-list .country.highlight {
+  background: rgba(0, 134, 240, 0.2);
+}
+.gevify-phone-input .react-tel-input .country-list .country-name {
+  color: #e4e4e7;
+}
+.gevify-phone-input .react-tel-input .country-list .dial-code {
+  color: #71717a;
+}
+.gevify-phone-input .react-tel-input .country-list .divider {
+  padding-bottom: 5px;
+  margin-bottom: 5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+.gevify-phone-input .react-tel-input .country-list::-webkit-scrollbar {
+  width: 8px;
+}
+.gevify-phone-input .react-tel-input .country-list::-webkit-scrollbar-thumb {
+  background: #333a55;
+  border-radius: 4px;
+}
+
