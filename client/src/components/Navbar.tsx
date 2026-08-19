@@ -75,7 +75,7 @@ const Navbar = ({}: NavbarProps) => {
 
   // Fetch the current logo from dynamic content
   useEffect(() => {
-    fetch("https://api.gavify.media/api/content")
+    fetch("https://api.gevify.media/api/content")
       .then((res) => res.json())
       .then((data) => {
         if (data && data.logo) setLogoUrl(data.logo);
@@ -89,7 +89,7 @@ const Navbar = ({}: NavbarProps) => {
     setLogoMsg(null);
     const token = localStorage.getItem("adminToken");
     try {
-      const res = await fetch("https://api.gavify.media/api/content/logo", {
+      const res = await fetch("https://api.gevify.media/api/content/logo", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

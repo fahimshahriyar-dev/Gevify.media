@@ -31,7 +31,7 @@ const About = ({ isAdminMode = false }: AboutProps) => {
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch("https://api.gavify.media/api/content")
+    fetch("https://api.gevify.media/api/content")
       .then((res) => res.json())
       .then((data) => {
         if (data.about) {
@@ -74,7 +74,7 @@ const About = ({ isAdminMode = false }: AboutProps) => {
     setSaving(true);
     const token = localStorage.getItem("adminToken");
     try {
-      const res = await fetch("https://api.gavify.media/api/content/about", {
+      const res = await fetch("https://api.gevify.media/api/content/about", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

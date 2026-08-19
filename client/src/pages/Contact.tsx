@@ -72,7 +72,7 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
 
   // Load dynamic contact content
   useEffect(() => {
-    fetch("https://api.gavify.media/api/content")
+    fetch("https://api.gevify.media/api/content")
       .then((res) => res.json())
       .then((data) => {
         if (data.logo) {
@@ -166,7 +166,7 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
     setSaveError(null);
     const token = localStorage.getItem("adminToken");
     try {
-      const res = await fetch("https://api.gavify.media/api/content/contact", {
+      const res = await fetch("https://api.gevify.media/api/content/contact", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -194,7 +194,7 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
       // Save the logo separately so a logo failure doesn't block the main save
       if (draftLogo.trim() && draftLogo.trim() !== logo) {
         try {
-          const logoRes = await fetch("https://api.gavify.media/api/content/logo", {
+          const logoRes = await fetch("https://api.gevify.media/api/content/logo", {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -265,7 +265,7 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
     setSubmitSuccess(false);
 
     try {
-      const response = await fetch("https://api.gavify.media/api/applications", {
+      const response = await fetch("https://api.gevify.media/api/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
