@@ -24,7 +24,7 @@ const AdminSignup: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/admin/signup", {
+      const response = await fetch("https://api.gavify.media/api/admin/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

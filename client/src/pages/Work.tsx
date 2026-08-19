@@ -63,7 +63,7 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
   const pageVideos = workVideos.slice(pageStart, pageStart + PAGE_SIZE);
 
   const fetchWorkPage = () => {
-    fetch("http://localhost:5000/api/content")
+    fetch("https://api.gavify.media/api/content")
       .then((res) => res.json())
       .then((data) => {
         if (data.workPage) {
@@ -151,7 +151,7 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
     setSaving(true);
     const token = localStorage.getItem("adminToken");
     try {
-      const res = await fetch("http://localhost:5000/api/content/work-page", {
+      const res = await fetch("https://api.gavify.media/api/content/work-page", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

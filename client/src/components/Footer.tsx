@@ -61,7 +61,7 @@ const Footer = ({ isAdminMode = false }: FooterProps) => {
 
   // Load dynamic footer content
   useEffect(() => {
-    fetch("http://localhost:5000/api/content")
+    fetch("https://api.gavify.media/api/content")
       .then((res) => res.json())
       .then((data) => {
         if (data.logo) setLogo(data.logo);
@@ -95,7 +95,7 @@ const Footer = ({ isAdminMode = false }: FooterProps) => {
     setSaving(true);
     const token = localStorage.getItem("adminToken");
     try {
-      const res = await fetch("http://localhost:5000/api/content/footer", {
+      const res = await fetch("https://api.gavify.media/api/content/footer", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -118,7 +118,7 @@ const Footer = ({ isAdminMode = false }: FooterProps) => {
       }
 
       if (draftLogo.trim()) {
-        const logoRes = await fetch("http://localhost:5000/api/content/logo", {
+        const logoRes = await fetch("https://api.gavify.media/api/content/logo", {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -168,7 +168,7 @@ const Footer = ({ isAdminMode = false }: FooterProps) => {
     setSubmitSuccess(false);
 
     try {
-      const response = await fetch("http://localhost:5000/api/applications", {
+      const response = await fetch("https://api.gavify.media/api/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

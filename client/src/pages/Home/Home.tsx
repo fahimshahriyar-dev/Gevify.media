@@ -92,7 +92,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
   // Fetch dynamic content
   const fetchContent = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/content");
+      const response = await fetch("https://api.gavify.media/api/content");
       if (!response.ok) {
         throw new Error("Failed to load website content");
       }
@@ -116,7 +116,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
   ) => {
     const token = localStorage.getItem("adminToken");
     try {
-      const response = await fetch("http://localhost:5000/api/content/hero", {
+      const response = await fetch("https://api.gavify.media/api/content/hero", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -143,7 +143,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const response = await fetch(
-        "http://localhost:5000/api/content/work-videos",
+        "https://api.gavify.media/api/content/work-videos",
         {
           method: "PUT",
           headers: {
@@ -175,7 +175,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const response = await fetch(
-        "http://localhost:5000/api/content/solution",
+        "https://api.gavify.media/api/content/solution",
         {
           method: "PUT",
           headers: {
@@ -208,7 +208,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const response = await fetch(
-        "http://localhost:5000/api/content/reviews",
+        "https://api.gavify.media/api/content/reviews",
         {
           method: "PUT",
           headers: {
@@ -236,7 +236,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
   const handleUpdateFaqs = async (faqs: FaqItem[]) => {
     const token = localStorage.getItem("adminToken");
     try {
-      const response = await fetch("http://localhost:5000/api/content/faqs", {
+      const response = await fetch("https://api.gavify.media/api/content/faqs", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -262,7 +262,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
   const handleUpdateBrands = async (brands: BrandsData) => {
     const token = localStorage.getItem("adminToken");
     try {
-      const response = await fetch("http://localhost:5000/api/content/brands", {
+      const response = await fetch("https://api.gavify.media/api/content/brands", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -291,7 +291,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const response = await fetch(
-        "http://localhost:5000/api/content/production",
+        "https://api.gavify.media/api/content/production",
         {
           method: "PUT",
           headers: {
