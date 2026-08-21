@@ -31,7 +31,7 @@ const About = ({ isAdminMode = false }: AboutProps) => {
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch("https://api.gevify.media/api/content")
+    fetch("http://localhost:5000/api/content")
       .then((res) => res.json())
       .then((data) => {
         if (data.about) {
@@ -48,13 +48,13 @@ const About = ({ isAdminMode = false }: AboutProps) => {
     tl.fromTo(
       titleRef.current,
       { y: 50, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
+      { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" },
     );
     tl.fromTo(
       contentRef.current?.children || [],
       { y: 30, opacity: 0 },
       { y: 0, opacity: 1, duration: 0.8, stagger: 0.2, ease: "power3.out" },
-      "-=0.5"
+      "-=0.5",
     );
   }, [text, title]);
 
@@ -74,19 +74,22 @@ const About = ({ isAdminMode = false }: AboutProps) => {
     setSaving(true);
     const token = localStorage.getItem("adminToken");
     try {
-      const res = await fetch("https://api.gevify.media/api/content/about", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          about: {
-            title: draftTitle,
-            description: draftText,
+      const res = await fetch(
+        "http://localhost:5000/api/content/about",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-        }),
-      });
+          body: JSON.stringify({
+            about: {
+              title: draftTitle,
+              description: draftText,
+            },
+          }),
+        },
+      );
       if (!res.ok) throw new Error("Save failed");
       const data = await res.json();
       if (data.about) {
@@ -102,7 +105,10 @@ const About = ({ isAdminMode = false }: AboutProps) => {
   };
 
   return (
-    <div ref={containerRef} className="w-full min-h-screen bg-gradient-to-b from-[#06102F] to-black text-white">
+    <div
+      ref={containerRef}
+      className="w-full min-h-screen bg-gradient-to-b from-[#06102F] to-black text-white"
+    >
       <Navbar />
 
       {/* Admin bar + Edit button */}
@@ -146,7 +152,10 @@ const About = ({ isAdminMode = false }: AboutProps) => {
 
         <div ref={contentRef} className="flex flex-col gap-6">
           {text.split("\n\n").map((para, i) => (
-            <p key={i} className="text-zinc-300 text-base sm:text-lg lg:text-xl leading-relaxed font-sans">
+            <p
+              key={i}
+              className="text-zinc-300 text-base sm:text-lg lg:text-xl leading-relaxed font-sans"
+            >
               {para}
             </p>
           ))}
@@ -161,7 +170,9 @@ const About = ({ isAdminMode = false }: AboutProps) => {
           <h3 className="text-lg font-bold text-white">Edit About Content</h3>
           <form onSubmit={handleSave} className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Title</label>
+              <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                Title
+              </label>
               <input
                 type="text"
                 value={draftTitle}
@@ -170,8 +181,12 @@ const About = ({ isAdminMode = false }: AboutProps) => {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Paragraphs</label>
-              <p className="text-[11px] text-zinc-500">Separate paragraphs with a blank line.</p>
+              <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                Paragraphs
+              </label>
+              <p className="text-[11px] text-zinc-500">
+                Separate paragraphs with a blank line.
+              </p>
               <textarea
                 value={draftText}
                 onChange={(e) => setDraftText(e.target.value)}

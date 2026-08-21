@@ -1,9 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import {
+  Pencil,
+  Plus,
+  Trash2,
+  ShoppingCart,
+  UserRound,
+  MonitorPlay,
+  Video,
+  ChartSpline,
+} from "lucide-react";
 import EditModalOverlay from "../../components/EditModalOverlay";
 import { gsap } from "gsap";
 import type { SolutionCard, BrandsData } from "./Home";
-import background2 from "../../assets/images/background_2.png";
+import background2 from "../../assets/images/background_2.webp";
+import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
 
 type EditPanel = "title" | "brands" | null;
 
@@ -26,31 +36,31 @@ const DEFAULT_CARDS: SolutionCard[] = [
     title: "E-Commerce \n product Ad Creative",
     subtitle:
       "High-performance video creatives for Amazon, Shopify, Walmart, TikTok Shop, and other commerce platforms designed to increase visibility, engagement, and conversions.",
-    image: "/src/assets/images/card_1.png",
+    image: "/src/assets/images/card_1.webp",
   },
   {
     title: "AI Influencer Systems \n for Brands",
     subtitle:
       "Custom AI influencers developed exclusively for your brand, delivering consistent content, scalable campaigns, and a recognizable digital presence.",
-    image: "/src/assets/images/card_2.png",
+    image: "/src/assets/images/card_2.webp",
   },
   {
     title: "Social Video \n Production",
     subtitle:
       "Strategic short-form and long-form video content created to maximize reach, engagement, and brand awareness across today's most influential platforms.",
-    image: "/src/assets/images/card_3.png",
+    image: "/src/assets/images/card_3.webp",
   },
   {
     title: "Commercial Content \n Production",
     subtitle:
       "Premium promotional videos for service businesses, restaurants, hospitality brands, real estate firms, healthcare providers, and corporate organizations seeking to elevate their market presence.",
-    image: "/src/assets/images/card_4.png",
+    image: "/src/assets/images/card_4.webp",
   },
   {
     title: "Agency Growth \n Partnership",
     subtitle:
       "Helping agencies scale creative delivery without the overhead. From Amazon and e-commerce consultancies to digital marketing and social media agencies, trusted white-label production enables partners to increase capacity, improve profitability, and focus on client growth while every relationship remains fully protected.",
-    image: "/src/assets/images/card_5.png",
+    image: "/src/assets/images/card_5.webp",
   },
 ];
 
@@ -206,30 +216,30 @@ const OurSolution = ({
   const row1Configs = [
     {
       width: "lg:w-[40%]",
-      image: "/src/assets/images/card_1.png",
+      image: "/src/assets/images/card_1.webp",
       textMaxW: "max-w-[240px] sm:max-w-[280px] md:max-w-[320px]",
     },
     {
       width: "lg:w-[25%]",
-      image: "/src/assets/images/card_2.png",
+      image: "/src/assets/images/card_2.webp",
       textMaxW: "max-w-[200px] sm:max-w-[240px]",
     },
     {
       width: "lg:w-[25%]",
-      image: "/src/assets/images/card_3.png",
+      image: "/src/assets/images/card_3.webp",
       textMaxW: "max-w-[200px] sm:max-w-[240px]",
     },
   ];
 
   const row2Configs = [
     {
-      width: "lg:w-[55%]",
-      image: "/src/assets/images/card_4.png",
+      width: "lg:w-[calc(50%+8px)]",
+      image: "/src/assets/images/card_4.webp",
       textMaxW: "max-w-[300px] sm:max-w-[360px] md:max-w-[420px]",
     },
     {
-      width: "lg:w-[35%]",
-      image: "/src/assets/images/card_5.png",
+      width: "lg:w-[calc(40%+8px)]",
+      image: "/src/assets/images/card_5.webp",
       textMaxW: "max-w-[240px] sm:max-w-[280px] md:max-w-[320px]",
     },
   ];
@@ -241,6 +251,22 @@ const OurSolution = ({
 
   return (
     <div ref={rootRef} className="relative">
+      <svg width="0" height="0" className="absolute pointer-events-none">
+        <defs>
+          <linearGradient
+            id="silver-icon-gradient"
+            x1="0%"
+            y1="0%"
+            x2="100%"
+            y2="100%"
+          >
+            <stop offset="0%" stopColor="#ffffff" />
+            <stop offset="35%" stopColor="#e2e8f0" />
+            <stop offset="70%" stopColor="#94a3b8" />
+            <stop offset="100%" stopColor="#475569" />
+          </linearGradient>
+        </defs>
+      </svg>
       {/* Title Edit icon - Directly underneath Admin Mode badge box */}
       {isAdminMode && (
         <button
@@ -252,18 +278,18 @@ const OurSolution = ({
         </button>
       )}
 
-      <section className="pt-30 sm:pt-40 lg:pt-55 relative group">
-        {/* Background image — pinned top-0 to bottom-0 inside section 1 */}
+      <section className="pt-30 sm:pt-40 lg:pt-55 relative overflow-hidden group">
+        {/* Background image — pinned inside section, z-0 so it stays visible in normal-flow layout */}
         <img
           src={background2}
           alt=""
           aria-hidden="true"
-          className="absolute inset-0 w-full h-full object-cover object-center select-none pointer-events-none -z-10"
+          className="absolute inset-0 w-full h-full object-cover object-center select-none pointer-events-none z-0"
           draggable={false}
         />
         <h1
           ref={titleRef}
-          className="bg-gradient-to-b from-[#333] to-[#c0c0c0] bg-clip-text text-transparent text-3xl sm:text-4xl md:text-5xl lg:text-6xl m-auto text-center px-4 max-w-5xl font-semibold"
+          className="relative z-10 bg-gradient-to-b from-[#333] to-[#c0c0c0] bg-clip-text text-transparent text-3xl sm:text-4xl md:text-5xl lg:text-6xl m-auto text-center px-4 max-w-5xl font-semibold"
         >
           {solutionTitle.split("\n").map((line, idx) => (
             <React.Fragment key={idx}>
@@ -275,102 +301,101 @@ const OurSolution = ({
 
         <div
           ref={cardsContainerRef}
-          className="w-full mt-10 sm:mt-16 lg:mt-20 flex flex-col gap-4 px-4 sm:px-6 lg:px-8"
+          className="relative z-10 w-full mt-10 sm:mt-16 lg:mt-20 flex flex-col gap-4 px-4 sm:px-6 lg:px-8"
         >
           {/* Row 1 Cards */}
           <div className="flex flex-col lg:flex-row gap-4 justify-center">
-            {row1Cards.map((card, i) => (
-              <div
-                key={`row1-card-${i}`}
-                className={`solution-card w-full ${row1Configs[i].width} h-[300px] sm:h-[380px] lg:h-[450px] rounded-2xl sm:rounded-3xl lg:rounded-4xl p-6 sm:p-8 lg:p-10 flex flex-col justify-start text-left overflow-hidden relative`}
-              >
-                {/* Silver Gradient Border Overlay */}
+            {row1Cards.map((card, i) => {
+              const Icon =
+                i === 0 ? ShoppingCart : i === 1 ? UserRound : MonitorPlay;
+              return (
                 <div
-                  className="absolute inset-0 rounded-[inherit] pointer-events-none z-20"
-                  style={{
-                    padding: "1px",
-                    background:
-                      "linear-gradient(135deg, #ffffff 0%, #e2e8f0 35%, #94a3b8 70%, #475569 100%)",
-                    WebkitMask:
-                      "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-                    WebkitMaskComposite: "xor",
-                    maskComposite: "exclude",
-                  }}
-                />
-                <img
-                  src={card.image || row1Configs[i].image}
-                  alt={card.title}
-                  loading="lazy"
-                  className="absolute inset-0 w-full h-full object-cover object-center select-none"
-                  draggable={false}
-                />
-                <div className="relative z-10 flex flex-col justify-start">
-                  <h3 className="card-text text-white text-xl sm:text-2xl font-bold tracking-tight leading-snug">
-                    {card.title.split("\n").map((line, idx) => (
-                      <React.Fragment key={idx}>
-                        {line}
-                        {idx < card.title.split("\n").length - 1 && <br />}
-                      </React.Fragment>
-                    ))}
-                  </h3>
-                  <p
-                    className={`card-text text-zinc-400 text-xs sm:text-sm mt-3 sm:mt-4 leading-relaxed ${row1Configs[i].textMaxW} max-w-full`}
-                  >
-                    {card.subtitle}
-                  </p>
+                  key={`row1-card-${i}`}
+                  className={`solution-card w-full ${row1Configs[i].width} h-[300px] sm:h-[380px] lg:h-[450px] rounded-2xl sm:rounded-3xl lg:rounded-4xl p-6 sm:p-8 lg:p-10 flex flex-col justify-start text-left overflow-hidden relative bg-white/[0.05] backdrop-blur-3xl hover:bg-white/[0.08] hover:scale-[1.01] transition-all duration-300 shadow-2xl`}
+                >
+                  {/* Silver Gradient Border Overlay */}
+                  <div
+                    className="absolute inset-0 rounded-[inherit] pointer-events-none z-20"
+                    style={{
+                      padding: "1px",
+                      background:
+                        "linear-gradient(135deg, #ffffff 0%, #e2e8f0 35%, #94a3b8 70%, #475569 100%)",
+                      WebkitMask:
+                        "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                      WebkitMaskComposite: "xor",
+                      maskComposite: "exclude",
+                    }}
+                  />
+                  <div className="relative z-10 flex flex-col justify-start">
+                    <Icon
+                      className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 mb-4 sm:mb-5 lg:mb-6"
+                      stroke="url(#silver-icon-gradient)"
+                      strokeWidth={1.5}
+                    />
+                    <h3 className="card-text text-white text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold tracking-tight leading-snug">
+                      {card.title.split("\n").map((line, idx) => (
+                        <React.Fragment key={idx}>
+                          {line}
+                          {idx < card.title.split("\n").length - 1 && <br />}
+                        </React.Fragment>
+                      ))}
+                    </h3>
+                    <p
+                      className={`card-text text-zinc-300 text-xs sm:text-sm lg:text-base mt-2 sm:mt-3 lg:mt-4 leading-relaxed font-medium ${row1Configs[i].textMaxW} max-w-full`}
+                    >
+                      {card.subtitle}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Row 2 Cards */}
           <div className="flex flex-col lg:flex-row gap-4 justify-center">
-            {row2Cards.map((card, i) => (
-              <div
-                key={`row2-card-${i}`}
-                className={`solution-card w-full ${row2Configs[i].width} h-[300px] sm:h-[380px] lg:h-[450px] rounded-2xl sm:rounded-3xl lg:rounded-4xl p-6 sm:p-8 lg:p-10 flex flex-col justify-start text-left overflow-hidden relative`}
-              >
-                {/* Silver Gradient Border Overlay */}
+            {row2Cards.map((card, i) => {
+              const Icon = i === 0 ? Video : ChartSpline;
+              return (
                 <div
-                  className="absolute inset-0 rounded-[inherit] pointer-events-none z-20"
-                  style={{
-                    padding: "1px",
-                    background:
-                      "linear-gradient(135deg, #ffffff 0%, #e2e8f0 35%, #94a3b8 70%, #475569 100%)",
-                    WebkitMask:
-                      "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-                    WebkitMaskComposite: "xor",
-                    maskComposite: "exclude",
-                  }}
-                />
-                <img
-                  src={card.image || row2Configs[i].image}
-                  alt={card.title}
-                  loading="lazy"
-                  className={
-                    i === 1
-                      ? "absolute inset-0 w-full h-full object-cover object-right select-none"
-                      : "absolute inset-0 w-full h-full object-cover object-center select-none"
-                  }
-                  draggable={false}
-                />
-                <div className="relative z-10 flex flex-col justify-start">
-                  <h3 className="card-text text-white text-xl sm:text-2xl font-bold tracking-tight leading-snug">
-                    {card.title.split("\n").map((line, idx) => (
-                      <React.Fragment key={idx}>
-                        {line}
-                        {idx < card.title.split("\n").length - 1 && <br />}
-                      </React.Fragment>
-                    ))}
-                  </h3>
-                  <p
-                    className={`card-text text-zinc-400 text-xs sm:text-sm mt-3 sm:mt-4 leading-relaxed ${row2Configs[i].textMaxW} max-w-full`}
-                  >
-                    {card.subtitle}
-                  </p>
+                  key={`row2-card-${i}`}
+                  className={`solution-card w-full ${row2Configs[i].width} h-[300px] sm:h-[380px] lg:h-[450px] rounded-2xl sm:rounded-3xl lg:rounded-4xl p-6 sm:p-8 lg:p-10 flex flex-col justify-start text-left overflow-hidden relative bg-white/[0.05] backdrop-blur-3xl hover:bg-white/[0.08] hover:scale-[1.01] transition-all duration-300 shadow-2xl`}
+                >
+                  {/* Silver Gradient Border Overlay */}
+                  <div
+                    className="absolute inset-0 rounded-[inherit] pointer-events-none z-20"
+                    style={{
+                      padding: "1px",
+                      background:
+                        "linear-gradient(135deg, #ffffff 0%, #e2e8f0 35%, #94a3b8 70%, #475569 100%)",
+                      WebkitMask:
+                        "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                      WebkitMaskComposite: "xor",
+                      maskComposite: "exclude",
+                    }}
+                  />
+                  <div className="relative z-10 flex flex-col justify-start">
+                    <Icon
+                      className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 mb-4 sm:mb-5 lg:mb-6"
+                      stroke="url(#silver-icon-gradient)"
+                      strokeWidth={1.5}
+                    />
+                    <h3 className="card-text text-white text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold tracking-tight leading-snug">
+                      {card.title.split("\n").map((line, idx) => (
+                        <React.Fragment key={idx}>
+                          {line}
+                          {idx < card.title.split("\n").length - 1 && <br />}
+                        </React.Fragment>
+                      ))}
+                    </h3>
+                    <p
+                      className={`card-text text-zinc-300 text-xs sm:text-sm lg:text-base mt-2 sm:mt-3 lg:mt-4 leading-relaxed font-medium ${row2Configs[i].textMaxW} max-w-full`}
+                    >
+                      {card.subtitle}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -394,7 +419,7 @@ const OurSolution = ({
 
         {/* Row 1: Right to Left */}
         <div className="flex w-max overflow-hidden">
-          <div className="flex gap-10 pr-10 items-center infinite-track">
+          <div className="flex gap-6 pr-6 sm:gap-8 sm:pr-8 md:gap-10 md:pr-10 items-center infinite-track">
             {(activeRow1.length > 0
               ? [
                   ...activeRow1,
@@ -410,12 +435,12 @@ const OurSolution = ({
             ).map((item, idx) => (
               <div
                 key={`row1-${idx}`}
-                className="flex items-center justify-center h-20 w-40 md:w-52 hover:scale-105 transition-all duration-300 cursor-pointer"
+                className="flex items-center justify-center h-14 sm:h-16 md:h-20 w-28 sm:w-36 md:w-48 lg:w-52 hover:scale-105 transition-all duration-300 cursor-pointer"
               >
                 <img
-                  src={item}
+                  src={optimizeCloudinaryUrl(item, 200)}
                   alt="Brand Logo"
-                  className="max-h-16 max-w-full object-contain filter brightness-0 invert opacity-75 hover:opacity-100 transition-opacity duration-300"
+                  className="max-h-8 sm:max-h-12 md:max-h-16 max-w-full object-contain filter brightness-0 invert opacity-75 hover:opacity-100 transition-opacity duration-300"
                 />
               </div>
             ))}
@@ -425,7 +450,7 @@ const OurSolution = ({
         {/* Row 2: Left to Right */}
         <div className="flex w-max overflow-hidden">
           <div
-            className="flex gap-10 pr-10 items-center infinite-track"
+            className="flex gap-6 pr-6 sm:gap-8 sm:pr-8 md:gap-10 md:pr-10 items-center infinite-track"
             style={{ animationDirection: "reverse" }}
           >
             {(activeRow2.length > 0
@@ -443,12 +468,12 @@ const OurSolution = ({
             ).map((item, idx) => (
               <div
                 key={`row2-${idx}`}
-                className="flex items-center justify-center h-20 w-40 md:w-52 hover:scale-105 transition-all duration-300 cursor-pointer"
+                className="flex items-center justify-center h-14 sm:h-16 md:h-20 w-28 sm:w-36 md:w-48 lg:w-52 hover:scale-105 transition-all duration-300 cursor-pointer"
               >
                 <img
-                  src={item}
+                  src={optimizeCloudinaryUrl(item, 200)}
                   alt="Brand Logo"
-                  className="max-h-16 max-w-full object-contain filter brightness-0 invert opacity-75 hover:opacity-100 transition-opacity duration-300"
+                  className="max-h-8 sm:max-h-12 md:max-h-16 max-w-full object-contain filter brightness-0 invert opacity-75 hover:opacity-100 transition-opacity duration-300"
                 />
               </div>
             ))}

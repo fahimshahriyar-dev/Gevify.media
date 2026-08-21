@@ -8,9 +8,12 @@ import { gsap } from "gsap";
 
 function extractYouTubeId(url: string): string | null {
   if (!url) return null;
-  if (url.includes("youtu.be/")) return url.split("youtu.be/")[1]?.split("?")[0] || null;
-  if (url.includes("watch?v=")) return url.split("watch?v=")[1]?.split("&")[0] || null;
-  if (url.includes("embed/")) return url.split("embed/")[1]?.split("?")[0] || null;
+  if (url.includes("youtu.be/"))
+    return url.split("youtu.be/")[1]?.split("?")[0] || null;
+  if (url.includes("watch?v="))
+    return url.split("watch?v=")[1]?.split("&")[0] || null;
+  if (url.includes("embed/"))
+    return url.split("embed/")[1]?.split("?")[0] || null;
   return null;
 }
 
@@ -63,7 +66,7 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
   const pageVideos = workVideos.slice(pageStart, pageStart + PAGE_SIZE);
 
   const fetchWorkPage = () => {
-    fetch("https://api.gevify.media/api/content")
+    fetch("http://localhost:5000/api/content")
       .then((res) => res.json())
       .then((data) => {
         if (data.workPage) {
@@ -103,10 +106,13 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
     const tl = gsap.timeline();
 
     // 1. Title and Vertical/Horizontal buttons
-    tl.to(
-      titleRef.current.children,
-      { y: 0, opacity: 1, duration: 0.8, stagger: 0.15, ease: "power4.out" }
-    );
+    tl.to(titleRef.current.children, {
+      y: 0,
+      opacity: 1,
+      duration: 0.8,
+      stagger: 0.15,
+      ease: "power4.out",
+    });
 
     // 2. Video cards rise smoothly from just below, starting right as the title appears
     if (gridRef.current && pageVideos.length > 0) {
@@ -120,7 +126,7 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
           ease: "power4.out",
           onComplete: () => setGridAnimating(false),
         },
-        "<0.2"
+        "<0.2",
       );
     }
 
@@ -129,7 +135,7 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
       tl.to(
         paginationRef.current,
         { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" },
-        "-=0.4"
+        "-=0.4",
       );
     }
   }, [currentPage, workTitle, workVideos]);
@@ -151,14 +157,19 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
     setSaving(true);
     const token = localStorage.getItem("adminToken");
     try {
-      const res = await fetch("https://api.gevify.media/api/content/work-page", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+      const res = await fetch(
+        "http://localhost:5000/api/content/work-page",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            workPage: { title: editTitle, videos: editVideos },
+          }),
         },
-        body: JSON.stringify({ workPage: { title: editTitle, videos: editVideos } })
-      });
+      );
       if (!res.ok) throw new Error("Failed to update work page");
       const data = await res.json();
       if (data.workPage) {
@@ -218,42 +229,57 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
 
         {/* Outer overflow-hidden wrapper clips cards as they rise from below */}
         <div className="flex-1 min-h-0 overflow-hidden">
-          <div className={`w-full h-full ${gridAnimating ? "overflow-hidden" : "overflow-y-auto scrollbar-thin pr-1"}`}>
-            <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 pb-4">
-            {workVideos.length > 0 && pageVideos.map((url, i) => {
-              const globalIdx = pageStart + i;
-              const thumb = getYouTubeThumbnail(url);
-              return (
-                <button
-                  key={globalIdx}
-                  onClick={() => { setActiveIndex(globalIdx); setIsPopupOpen(true); }}
-                  className="group relative aspect-video rounded-2xl overflow-hidden bg-zinc-900/50 border border-white/10 hover:border-[#0086F0]/50 transition-all duration-300 cursor-pointer opacity-0"
-                >
-                  {thumb ? (
-                    <img
-                      src={thumb}
-                      alt={`Work ${globalIdx + 1}`}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-zinc-600 text-sm font-medium">
-                      No Thumbnail
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <div className="w-14 h-14 rounded-full bg-gradient-to-r from-[#0086F0] to-[#5ACFFE] flex items-center justify-center shadow-lg shadow-[#0086F0]/30 transition-transform duration-300 group-hover:scale-110">
-                      <Play className="w-6 h-6 text-white ml-0.5" fill="white" />
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+          <div
+            className={`w-full h-full ${gridAnimating ? "overflow-hidden" : "overflow-y-auto scrollbar-thin pr-1"}`}
+          >
+            <div
+              ref={gridRef}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 pb-4"
+            >
+              {workVideos.length > 0 &&
+                pageVideos.map((url, i) => {
+                  const globalIdx = pageStart + i;
+                  const thumb = getYouTubeThumbnail(url);
+                  return (
+                    <button
+                      key={globalIdx}
+                      onClick={() => {
+                        setActiveIndex(globalIdx);
+                        setIsPopupOpen(true);
+                      }}
+                      className="group relative aspect-video rounded-2xl overflow-hidden bg-zinc-900/50 border border-white/10 hover:border-[#0086F0]/50 transition-all duration-300 cursor-pointer opacity-0"
+                    >
+                      {thumb ? (
+                        <img
+                          src={thumb}
+                          alt={`Work ${globalIdx + 1}`}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-zinc-600 text-sm font-medium">
+                          No Thumbnail
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <div className="w-14 h-14 rounded-full bg-gradient-to-r from-[#0086F0] to-[#5ACFFE] flex items-center justify-center shadow-lg shadow-[#0086F0]/30 transition-transform duration-300 group-hover:scale-110">
+                          <Play
+                            className="w-6 h-6 text-white ml-0.5"
+                            fill="white"
+                          />
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+            </div>
           </div>
         </div>
 
         {totalPages > 1 && (
-          <div ref={paginationRef} className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 pt-4 shrink-0">
+          <div
+            ref={paginationRef}
+            className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 pt-4 shrink-0"
+          >
             <button
               onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
               disabled={currentPage === 0}
@@ -275,7 +301,9 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
               </button>
             ))}
             <button
-              onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))}
+              onClick={() =>
+                setCurrentPage(Math.min(totalPages - 1, currentPage + 1))
+              }
               disabled={currentPage >= totalPages - 1}
               className="px-3 sm:px-4 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all text-sm font-semibold cursor-pointer"
             >
@@ -290,9 +318,14 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
       <EditModalOverlay isOpen={activeEdit} onClose={closeEdit}>
         <div className="flex flex-col max-h-[80vh]">
           <h3 className="text-xl font-bold text-white mb-4">Edit Work Page</h3>
-          <form onSubmit={handleSave} className="flex-1 overflow-y-auto flex flex-col gap-6 pr-2 mb-6 max-h-[60vh]">
+          <form
+            onSubmit={handleSave}
+            className="flex-1 overflow-y-auto flex flex-col gap-6 pr-2 mb-6 max-h-[60vh]"
+          >
             <div className="flex flex-col gap-2 p-4 bg-zinc-900/60 border border-zinc-800/80 rounded-2xl">
-              <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Page Title</label>
+              <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                Page Title
+              </label>
               <input
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
@@ -302,7 +335,9 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
 
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
-                <h4 className="text-xs font-bold text-zinc-300 uppercase tracking-wider">Video Links</h4>
+                <h4 className="text-xs font-bold text-zinc-300 uppercase tracking-wider">
+                  Video Links
+                </h4>
                 <button
                   type="button"
                   onClick={() => setEditVideos([...editVideos, ""])}
@@ -312,7 +347,10 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
                 </button>
               </div>
               {editVideos.map((url, idx) => (
-                <div key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900 border border-zinc-800">
+                <div
+                  key={idx}
+                  className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900 border border-zinc-800"
+                >
                   <span className="w-6 h-6 rounded-full bg-zinc-800 text-zinc-400 text-xs font-bold flex items-center justify-center shrink-0">
                     {idx + 1}
                   </span>
@@ -328,7 +366,9 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
                   />
                   <button
                     type="button"
-                    onClick={() => setEditVideos(editVideos.filter((_, i) => i !== idx))}
+                    onClick={() =>
+                      setEditVideos(editVideos.filter((_, i) => i !== idx))
+                    }
                     className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer"
                     title="Remove Video"
                   >
@@ -339,10 +379,19 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
             </div>
           </form>
           <div className="flex justify-end gap-3 pt-4 border-t border-zinc-900">
-            <button type="button" onClick={closeEdit} className="px-5 py-2.5 rounded-full border border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-white text-sm font-semibold transition-colors cursor-pointer">
+            <button
+              type="button"
+              onClick={closeEdit}
+              className="px-5 py-2.5 rounded-full border border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-white text-sm font-semibold transition-colors cursor-pointer"
+            >
               Cancel
             </button>
-            <button type="submit" onClick={handleSave} disabled={saving} className="px-6 py-2.5 rounded-full bg-[#0086F0] hover:bg-[#0073ce] text-white text-sm font-semibold transition-colors disabled:opacity-50 cursor-pointer">
+            <button
+              type="submit"
+              onClick={handleSave}
+              disabled={saving}
+              className="px-6 py-2.5 rounded-full bg-[#0086F0] hover:bg-[#0073ce] text-white text-sm font-semibold transition-colors disabled:opacity-50 cursor-pointer"
+            >
               {saving ? "Saving..." : "Save Changes"}
             </button>
           </div>

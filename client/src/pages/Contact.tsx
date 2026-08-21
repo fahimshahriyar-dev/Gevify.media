@@ -7,7 +7,8 @@ import PhoneNumberInput, {
 } from "../components/PhoneNumberInput";
 import { Mail, Pencil } from "lucide-react";
 import { gsap } from "gsap";
-import contactBg from "../assets/images/contact_bg.png";
+import contactBg from "../assets/images/contact_bg.webp";
+import { optimizeCloudinaryUrl } from "../utils/cloudinary";
 
 interface ContactProps {
   isAdminMode?: boolean;
@@ -47,9 +48,9 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
   const [saveError, setSaveError] = useState<string | null>(null);
 
   const [showForm, setShowForm] = useState(false);
-  const [contactMethod, setContactMethod] = useState<
-    "whatsapp" | "email"
-  >("email");
+  const [contactMethod, setContactMethod] = useState<"whatsapp" | "email">(
+    "email",
+  );
   const scrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Refs for entrance animation targets
@@ -72,7 +73,7 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
 
   // Load dynamic contact content
   useEffect(() => {
-    fetch("https://api.gevify.media/api/content")
+    fetch("http://localhost:5000/api/content")
       .then((res) => res.json())
       .then((data) => {
         if (data.logo) {
@@ -166,16 +167,23 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
     setSaveError(null);
     const token = localStorage.getItem("adminToken");
     try {
-      const res = await fetch("https://api.gevify.media/api/content/contact", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const res = await fetch(
+        "http://localhost:5000/api/content/contact",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ contact: draft }),
         },
-        body: JSON.stringify({ contact: draft }),
-      });
+      );
       if (!res.ok) {
-        throw new Error(res.status === 401 ? "Session expired. Please log in again." : "Save failed");
+        throw new Error(
+          res.status === 401
+            ? "Session expired. Please log in again."
+            : "Save failed",
+        );
       }
       const data = await res.json();
       if (data.contact) {
@@ -194,14 +202,17 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
       // Save the logo separately so a logo failure doesn't block the main save
       if (draftLogo.trim() && draftLogo.trim() !== logo) {
         try {
-          const logoRes = await fetch("https://api.gevify.media/api/content/logo", {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
+          const logoRes = await fetch(
+            "http://localhost:5000/api/content/logo",
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ logo: draftLogo.trim() }),
             },
-            body: JSON.stringify({ logo: draftLogo.trim() }),
-          });
+          );
           if (logoRes.ok) {
             const logoData = await logoRes.json();
             if (logoData.logo) setLogo(logoData.logo);
@@ -211,7 +222,9 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
         }
       }
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : "Failed to save changes");
+      setSaveError(
+        err instanceof Error ? err.message : "Failed to save changes",
+      );
     } finally {
       setSaving(false);
     }
@@ -252,11 +265,21 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
   const [submitError, setSubmitError] = useState("");
 
   const handleSubmit = async () => {
-    if (!formData.name || !formData.videoCount || !formData.videoType || !formData.budget || !contactMethod || !formData.contact) {
+    if (
+      !formData.name ||
+      !formData.videoCount ||
+      !formData.videoType ||
+      !formData.budget ||
+      !contactMethod ||
+      !formData.contact
+    ) {
       setSubmitError("Please fill out all fields.");
       return;
     }
-    if (contactMethod === "whatsapp" && !isValidWhatsAppNumber(formData.contact)) {
+    if (
+      contactMethod === "whatsapp" &&
+      !isValidWhatsAppNumber(formData.contact)
+    ) {
       setSubmitError("Please enter a valid WhatsApp number.");
       return;
     }
@@ -265,14 +288,17 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
     setSubmitSuccess(false);
 
     try {
-      const response = await fetch("https://api.gevify.media/api/applications", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          contactMethod
-        })
-      });
+      const response = await fetch(
+        "http://localhost:5000/api/applications",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...formData,
+            contactMethod,
+          }),
+        },
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -280,7 +306,13 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
       }
 
       setSubmitSuccess(true);
-      setFormData({ name: "", videoCount: "", videoType: "", budget: "", contact: "" });
+      setFormData({
+        name: "",
+        videoCount: "",
+        videoType: "",
+        budget: "",
+        contact: "",
+      });
       setContactMethod("email");
     } catch (err: any) {
       setSubmitError(err.message || "Error submitting form");
@@ -328,11 +360,8 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
         </>
       )}
 
-      {/* ═══════════════════════════════════════════════════════
-          SECTION 1 — Title Section (visible by default)
-          ═══════════════════════════════════════════════════════ */}
       <div
-        className="absolute inset-0 z-10 w-full mx-auto px-4 sm:px-10 lg:px-16 lg:max-w-[1400px] pointer-events-none flex flex-col justify-center"
+        className="absolute inset-0 z-10 w-full mx-auto px-4 sm:px-8 lg:px-16 lg:max-w-[1400px] pointer-events-none flex flex-col justify-center"
         style={{
           opacity: showForm ? 0 : 1,
           transform: showForm ? "translateY(-60px)" : "translateY(0)",
@@ -344,111 +373,140 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
         {/* Scalable stack: Div 1 + Div 2 + Div 3 */}
         <div
           ref={stackRef}
-          className="flex flex-col"
+          className="flex flex-col gap-2 sm:gap-0"
           style={{ transformOrigin: "center center" }}
         >
           {/* Div 1: Brand Logo + Name (left) & Contact Info (right) */}
-          <div className="flex items-end justify-between w-full pointer-events-auto">
-          {/* Left: Brand Logo & Name */}
-          <div ref={brandRef} className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-            <img
-              src={logo}
-              alt={contact.company}
-              className="h-8 sm:h-9 w-auto object-contain shrink-0"
-            />
-            <span className="text-lg sm:text-xl font-bold tracking-tight truncate">
-              {contact.company.split(".")[0]}.<span className="text-[#5ACFFE]">{contact.company.includes(".") ? contact.company.split(".")[1] : ""}</span>
-            </span>
-          </div>
-
-          {/* Right: Email & Social Links */}
-          <div ref={contactRef} className="flex flex-col items-end gap-2 text-right min-w-0">
-            <div className="flex items-center gap-1.5 text-xs sm:text-sm text-zinc-400">
-              <span>For queries:</span>
-              <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-400" />
-            </div>
-            <a
-              href={`mailto:${contact.email}`}
-              className="text-sm sm:text-base font-semibold text-white hover:text-[#5ACFFE] transition-colors break-all"
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between w-full gap-4 sm:gap-0 pointer-events-auto">
+            {/* Left: Brand Logo & Name */}
+            <div
+              ref={brandRef}
+              className="flex items-center gap-2 sm:gap-2.5 min-w-0"
             >
-              {contact.email}
-            </a>
-            <div className="flex items-center gap-3 sm:gap-4 mt-1">
+              <img
+                src={optimizeCloudinaryUrl(logo, 160)}
+                alt={contact.company}
+                className="hidden sm:block h-7 sm:h-8 md:h-9 w-auto object-contain shrink-0"
+              />
+              <span className="text-base sm:text-lg md:text-xl font-bold tracking-tight truncate">
+                {contact.company.split(".")[0]}.
+                <span className="text-[#5ACFFE]">
+                  {contact.company.includes(".")
+                    ? contact.company.split(".")[1]
+                    : ""}
+                </span>
+              </span>
+            </div>
+
+            {/* Right: Email & Social Links */}
+            <div
+              ref={contactRef}
+              className="flex flex-col items-start sm:items-end gap-1.5 sm:gap-2 text-left sm:text-right min-w-0"
+            >
+              <div className="flex items-center gap-1.5 text-xs text-zinc-400">
+                <span>For queries:</span>
+                <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-400" />
+              </div>
               <a
-                href={contact.facebook}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-zinc-400 hover:text-white transition-colors"
-                title="Facebook"
+                href={`mailto:${contact.email}`}
+                className="text-xs sm:text-sm md:text-base font-semibold text-white hover:text-[#5ACFFE] transition-colors break-all"
               >
-                <svg className="w-5 h-5 sm:w-6 sm:h-6 fill-current" viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                </svg>
+                {contact.email}
               </a>
-              <a
-                href={contact.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-zinc-400 hover:text-white transition-colors"
-                title="Instagram"
-              >
-                <svg
-                  className="w-5 h-5 sm:w-6 sm:h-6 fill-none stroke-current"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
+              <div className="flex items-center gap-3 sm:gap-4 mt-0.5">
+                <a
+                  href={contact.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-zinc-400 hover:text-white transition-colors"
+                  title="Facebook"
                 >
-                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                  <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zM17.5 6.5h.01" />
-                </svg>
-              </a>
-              <a
-                href={contact.whatsapp}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-zinc-400 hover:text-white transition-colors"
-                title="WhatsApp"
-              >
-                <svg className="w-5 h-5 sm:w-6 sm:h-6 fill-current" viewBox="0 0 24 24">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-                </svg>
-              </a>
-              <a
-                href={contact.youtube}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-zinc-400 hover:text-white transition-colors"
-                title="YouTube"
-              >
-                <svg className="w-5 h-5 sm:w-6 sm:h-6 fill-current" viewBox="0 0 24 24">
-                  <path d="M23.498 6.163a3.003 3.003 0 00-2.11-2.107C19.53 3.5 12 3.5 12 3.5s-7.53 0-9.388.556A3.003 3.003 0 00.5 6.163C0 8.03 0 12 0 12s0 3.97.5 5.837a3.003 3.003 0 002.11 2.107C4.47 20.5 12 20.5 12 20.5s7.53 0 9.388-.556a3.003 3.003 0 002.11-2.107C24 15.97 24 12 24 12s0-3.97-.5-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                </svg>
-              </a>
+                  <svg
+                    className="w-4 h-4 sm:w-5 sm:h-5 fill-current"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                  </svg>
+                </a>
+                <a
+                  href={contact.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-zinc-400 hover:text-white transition-colors"
+                  title="Instagram"
+                >
+                  <svg
+                    className="w-4 h-4 sm:w-5 sm:h-5 fill-none stroke-current"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                    <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zM17.5 6.5h.01" />
+                  </svg>
+                </a>
+                <a
+                  href={contact.whatsapp}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-zinc-400 hover:text-white transition-colors"
+                  title="WhatsApp"
+                >
+                  <svg
+                    className="w-4 h-4 sm:w-5 sm:h-5 fill-current"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                  </svg>
+                </a>
+                <a
+                  href={contact.youtube}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-zinc-400 hover:text-white transition-colors"
+                  title="YouTube"
+                >
+                  <svg
+                    className="w-4 h-4 sm:w-5 sm:h-5 fill-current"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M23.498 6.163a3.003 3.003 0 00-2.11-2.107C19.53 3.5 12 3.5 12 3.5s-7.53 0-9.388.556A3.003 3.003 0 00.5 6.163C0 8.03 0 12 0 12s0 3.97.5 5.837a3.003 3.003 0 002.11 2.107C4.47 20.5 12 20.5 12 20.5s7.53 0 9.388-.556a3.003 3.003 0 002.11-2.107C24 15.97 24 12 24 12s0-3.97-.5-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                  </svg>
+                </a>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Div 2: Main Title */}
-        <h1
-          ref={titleRef}
-          className="text-[11vw] sm:text-[100px] lg:text-[140px] font-bold tracking-tighter bg-gradient-to-b from-[#333] to-[#c0c0c0] bg-clip-text text-transparent leading-none text-center pointer-events-auto whitespace-nowrap pb-[0.15em]"
-        >
-          {contact.title}
-        </h1>
+          {/* Div 2: Main Title */}
+          <h1
+            ref={titleRef}
+            className="text-[12vw] sm:text-[10vw] md:text-[9vw] lg:text-[120px] xl:text-[140px] font-bold tracking-tighter bg-gradient-to-b from-[#333] to-[#c0c0c0] bg-clip-text text-transparent leading-none text-left pointer-events-auto pb-[0.15em] break-words"
+          >
+            {contact.title}
+          </h1>
 
-        {/* Div 3: All Rights (left) */}
-        <p ref={copyrightRef} className="text-xs sm:text-sm text-zinc-500 font-medium text-left pointer-events-auto">
-          © All Rights Reserved |{" "}
-          <span className="text-zinc-300 font-semibold">{contact.company}</span> 2026 | Designed & Developed by Fahim Shahriyar Mugdho
-        </p>
+          {/* Div 3: All Rights (left) */}
+          <p
+            ref={copyrightRef}
+            className="text-[10px] sm:text-xs md:text-sm text-zinc-500 font-medium text-left pointer-events-auto"
+          >
+            © All Rights Reserved |{" "}
+            <span className="text-zinc-300 font-semibold">
+              {contact.company}
+            </span>{" "}
+            2026 | Designed & Developed by Fahim Shahriyar Mugdho
+          </p>
         </div>
 
         {/* Scroll Down Indicator — Bottom Center */}
-        <div ref={scrollRef} className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-auto lg:bottom-16">
-          <span className="text-xs text-zinc-500 tracking-[0.2em] uppercase font-medium">
+        <div
+          ref={scrollRef}
+          className="absolute bottom-6 sm:bottom-10 lg:bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 sm:gap-2 pointer-events-auto"
+        >
+          <span className="text-[10px] sm:text-xs text-zinc-500 tracking-[0.2em] uppercase font-medium">
             Scroll Down
           </span>
           <svg
-            className="w-5 h-5 text-zinc-500"
+            className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-500"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
@@ -457,7 +515,11 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
               animation: "contact-bounce 1.8s ease-in-out infinite",
             }}
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
         </div>
 
@@ -509,7 +571,9 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
                 type="text"
                 placeholder="Your answer here..."
                 value={formData.videoCount}
-                onChange={(e) => handleInputChange("videoCount", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("videoCount", e.target.value)
+                }
                 className="w-full bg-transparent border-b border-zinc-700 focus:border-[#0086F0] outline-none text-sm text-zinc-300 placeholder-zinc-600 pb-3 transition-colors duration-300"
               />
             </div>
@@ -592,7 +656,9 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
 
             {/* Error / Success feedback messages */}
             {submitError && (
-              <p className="text-sm font-semibold text-red-500">{submitError}</p>
+              <p className="text-sm font-semibold text-red-500">
+                {submitError}
+              </p>
             )}
             {submitSuccess && (
               <p className="text-sm font-semibold text-green-400">
@@ -620,7 +686,9 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
           <form onSubmit={handleSave} className="flex flex-col gap-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col gap-2 sm:col-span-2">
-                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Logo URL</label>
+                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                  Logo URL
+                </label>
                 <input
                   type="text"
                   value={draftLogo}
@@ -630,7 +698,9 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Title</label>
+                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                  Title
+                </label>
                 <input
                   type="text"
                   value={draft.title}
@@ -639,7 +709,9 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Company Name</label>
+                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                  Company Name
+                </label>
                 <input
                   type="text"
                   value={draft.company}
@@ -648,7 +720,9 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Email</label>
+                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                  Email
+                </label>
                 <input
                   type="text"
                   value={draft.email}
@@ -657,7 +731,9 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">WhatsApp URL</label>
+                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                  WhatsApp URL
+                </label>
                 <input
                   type="text"
                   value={draft.whatsapp}
@@ -666,7 +742,9 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Facebook URL</label>
+                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                  Facebook URL
+                </label>
                 <input
                   type="text"
                   value={draft.facebook}
@@ -675,7 +753,9 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Instagram URL</label>
+                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                  Instagram URL
+                </label>
                 <input
                   type="text"
                   value={draft.instagram}
@@ -684,7 +764,9 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">YouTube URL</label>
+                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                  YouTube URL
+                </label>
                 <input
                   type="text"
                   value={draft.youtube}

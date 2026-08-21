@@ -40,7 +40,7 @@ const Reviews = ({
     if (!active) {
       gsap.set(titleRef.current, { y: 40, opacity: 0 });
       const cards = getCards();
-      if (cards) gsap.set(cards, { y: 50, opacity: 0 });
+      if (cards && cards.length > 0) gsap.set(cards, { y: 50, opacity: 0 });
       return;
     }
 
@@ -136,27 +136,27 @@ const Reviews = ({
           {(reviews.length > 0 ? [...reviews, ...reviews, ...reviews] : []).map((review, idx) => (
             <div
               key={idx}
-              className="w-[60vw] min-[480px]:w-[340px] sm:w-[460px] md:w-[500px] lg:w-[520px] xl:w-[540px] flex flex-col justify-between p-3 sm:p-8 md:p-10 rounded-2xl bg-white/[0.03] border border-white/10 text-zinc-300 backdrop-blur-lg shadow-2xl shrink-0 hover:bg-white/[0.05] hover:border-[#0086F0]/30 transition-all duration-300"
+              className="w-[85vw] min-[480px]:w-[340px] sm:w-[420px] md:w-[460px] lg:w-[500px] flex flex-col justify-between p-5 sm:p-8 md:p-10 rounded-2xl bg-white/[0.03] border border-white/10 text-zinc-300 backdrop-blur-lg shadow-2xl shrink-0 hover:bg-white/[0.05] hover:border-[#0086F0]/30 transition-all duration-300"
             >
-              <p className="text-[15px] md:text-base leading-relaxed text-zinc-300/90 font-medium mb-8">
+              <p className="text-sm md:text-base leading-relaxed text-zinc-300/90 font-medium mb-6 sm:mb-8">
                 "{review.quote}"
               </p>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 sm:gap-4">
                 {review.avatar && review.avatar.trim() !== "" ? (
                   <img
                     src={review.avatar}
                     alt={review.name}
-                    className="w-12 h-12 rounded-full object-cover border border-zinc-700/50"
+                    className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover border border-zinc-700/50"
                     loading="lazy"
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center border border-zinc-700/50 shrink-0">
-                    <UserRound className="w-6 h-6 text-zinc-900" />
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white flex items-center justify-center border border-zinc-700/50 shrink-0">
+                    <UserRound className="w-5 h-5 md:w-6 md:h-6 text-zinc-900" />
                   </div>
                 )}
                 <div>
-                  <h4 className="text-white text-sm font-semibold tracking-wide">{review.name}</h4>
-                  <p className="text-zinc-500 text-xs mt-0.5">{review.role}</p>
+                  <h4 className="text-white text-xs md:text-sm font-semibold tracking-wide">{review.name}</h4>
+                  <p className="text-zinc-500 text-[10px] md:text-xs mt-0.5">{review.role}</p>
                 </div>
               </div>
             </div>

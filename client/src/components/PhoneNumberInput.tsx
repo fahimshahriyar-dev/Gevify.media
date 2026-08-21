@@ -1,4 +1,5 @@
 import ReactPhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 
 // Vite/esbuild CJS interop may resolve the default import to the
 // namespace object `{ default: Component }` instead of the component.

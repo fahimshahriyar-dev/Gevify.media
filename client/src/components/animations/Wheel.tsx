@@ -26,7 +26,6 @@ const CENTER_ICON_SIZE = 52;
 
 const POPUP_WIDTH = 230;
 const POPUP_HEIGHT = 74;
-const POPUP_GAP = 16;
 
 const POPUP_OPEN_DURATION = 0.3;
 const PATH2_START_PAUSE = 0.15;
@@ -279,6 +278,7 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
     return () => ctx.revert();
   }, [boxes]);
 
+  /*
   const handleBoxMouseEnter = (i: number) => {
     // Glow the hovered box
     const rect = boxRectRefs.current[i];
@@ -305,7 +305,9 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
       gsap.set(popup, { opacity: 1, scale: 1 });
     }
   };
+  */
 
+  /*
   const handleBoxMouseLeave = (i: number) => {
     if (i === 0) return;
 
@@ -315,9 +317,17 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
       const glow = boxGlowRefs.current[i];
       const icon = boxIconRefs.current[i];
       if (rect && glow && icon) {
-        gsap.to(rect, { attr: { stroke: "#D9D9D9" }, duration: 0.3, overwrite: "auto" });
+        gsap.to(rect, {
+          attr: { stroke: "#D9D9D9" },
+          duration: 0.3,
+          overwrite: "auto",
+        });
         gsap.to(glow, { opacity: 0, duration: 0.3, overwrite: "auto" });
-        gsap.to(icon, { attr: { stroke: "#9CA3AF" }, duration: 0.3, overwrite: "auto" });
+        gsap.to(icon, {
+          attr: { stroke: "#9CA3AF" },
+          duration: 0.3,
+          overwrite: "auto",
+        });
       }
 
       // Kill any in-progress tween and hide popup instantly
@@ -328,12 +338,15 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
       }
     }
   };
+  */
 
   return (
-    <div className="w-full max-w-[2000px] flex items-center justify-center absolute left-1/2 -translate-x-1/2 bottom-5 md:bottom-10 lg:left-[350px] lg:right-auto lg:translate-x-0 lg:bottom-10 lg:top-auto lg:translate-y-0">
+    // Takes full width on mobile/tablet; locks to 70% (minus half the
+    // parent's gap-12) on lg+ so it matches the 30% text column exactly.
+    <div className="w-full lg:w-[calc(70%-1.5rem)] flex items-center justify-center relative">
       <svg
         viewBox="0 0 1495 494"
-        className="w-full h-auto max-w-[1500px] overflow-visible"
+        className="w-full h-auto overflow-visible"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
@@ -513,10 +526,11 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
 
         <g ref={wheelGroupRef}>
           {boxes.map((pos, i) => {
-            const { icon: Icon, title, subtitleLines } = BOX_DATA[i];
+            const { icon: Icon } = BOX_DATA[i];
             const iconSize = 26;
 
             // Directional popup positioning
+            /*
             const sideGap = 14;
             const cardW = POPUP_WIDTH;
             const cardH = 40;
@@ -547,6 +561,7 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
               scaleOriginX = pos.cx;
               scaleOriginY = sidePopupY; // top edge of card
             }
+            */
 
             return (
               <g
@@ -554,9 +569,11 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
                 ref={(el) => {
                   boxCounterRefs.current[i] = el;
                 }}
-                className="cursor-pointer"
+                className="cursor-default"
+                /*
                 onMouseEnter={() => handleBoxMouseEnter(i)}
                 onMouseLeave={() => handleBoxMouseLeave(i)}
+                */
               >
                 <rect
                   ref={(el) => {
@@ -603,6 +620,7 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
                 </g>
 
                 {/* Directional popup — title only, no arrow */}
+                {/*
                 <g
                   transform={`translate(${scaleOriginX}, ${scaleOriginY}) scale(${responsiveScale}) translate(${-scaleOriginX}, ${-scaleOriginY})`}
                 >
@@ -638,6 +656,7 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
                     </text>
                   </g>
                 </g>
+                */}
               </g>
             );
           })}

@@ -197,17 +197,34 @@ const Production: React.FC<ProductionProps> = ({
             <Pencil className="w-4 h-4" />
           </button>
         )}
-        <div className="w-full max-w-7xl h-[calc(100vh-140px)] sm:h-[calc(100vh-270px)] lg:h-[calc(100vh-270px)] flex flex-col xl:flex-row items-center xl:items-start justify-between gap-8 xl:gap-12 relative z-10">
-          <div className="w-full xl:w-[500px] 2xl:w-[600px] flex flex-col items-start text-left gap-5 px-4 lg:px-0 absolute top-0 left-0 z-20 xl:relative">
+        {/*
+          Widened from max-w-7xl (1280px) so that, on large screens, the
+          70% wheel column actually resolves against real available
+          screen width instead of being capped by this container.
+          Swap to `max-w-none` (or drop max-w-* entirely) if you want it
+          to use the full viewport width edge-to-edge on very large screens.
+        */}
+        <div className="w-full max-w-[1600px] mx-auto h-auto lg:h-[calc(100vh-270px)] flex flex-col lg:flex-row items-center lg:items-center justify-between gap-8 lg:gap-12 relative z-10">
+          {/*
+            Locked to exactly 30% on lg+ (matching the Wheel's 70%) instead
+            of the old 35% / 38% / 45% breakpoint overrides, so the split
+            stays a true 30/70 at every large breakpoint. The `calc()`
+            accounts for half of the parent's gap-12 (3rem) so the two
+            columns fit together without overflow.
+            mb-[100px]/mb-[120px] push the animation down below the text
+            on sm/md (stacked layout); reset to mb-0 at lg where the
+            columns sit side by side instead of stacked.
+          */}
+          <div className="w-full mb-[100px] md:mb-[160px] lg:mb-0 lg:w-[calc(30%-1.5rem)] flex flex-col items-start text-left gap-4 md:gap-5 px-4 lg:px-0 relative z-20">
             <span
               ref={sectionSubtitleRef}
-              className="text-xs md:text-sm font-semibold tracking-[0.2em] text-[#0086F0] uppercase opacity-0 will-change-transform"
+              className="text-[10px] sm:text-xs md:text-sm lg:text-[11px] xl:text-xs 2xl:text-sm font-semibold tracking-[0.2em] text-[#0086F0] uppercase opacity-0 will-change-transform"
             >
               {prodData.sectionSubtitle}
             </span>
             <h2
               ref={titleRef}
-              className="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.1] opacity-0 will-change-transform"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-extrabold tracking-tight text-slate-900 leading-[1.15] opacity-0 will-change-transform"
             >
               {prodData.title.split("\n").map((line, idx) => (
                 <React.Fragment key={idx}>
@@ -218,7 +235,7 @@ const Production: React.FC<ProductionProps> = ({
             </h2>
             <p
               ref={descRef}
-              className="text-sm md:text-base text-slate-700 font-normal leading-relaxed max-w-lg mt-1 opacity-0 will-change-transform"
+              className="text-xs sm:text-sm md:text-base lg:text-xs xl:text-sm 2xl:text-base text-slate-700 font-normal leading-relaxed max-w-lg mt-1 opacity-0 will-change-transform"
             >
               {prodData.description}
             </p>

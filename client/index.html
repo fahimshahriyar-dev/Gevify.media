@@ -5,9 +5,20 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gevify.media</title>
+    <!-- Fonts: preconnect first, then load in parallel (non-blocking) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <!-- Preconnect to Cloudinary early — the navbar logo (LCP element) comes from here -->
+    <link rel="preconnect" href="https://res.cloudinary.com" />
+    <!-- Preload the default navbar logo (LCP element) at the highest priority -->
+    <link rel="preload" as="image" href="https://res.cloudinary.com/dsmkxcczo/image/upload/f_auto,q_auto,w_160/v1786910291/logo_o11gn5.png" fetchpriority="high" />
+    <!-- Preload hero background image -->
+    <link rel="preload" as="image" type="image/webp" href="/src/assets/images/background.webp" fetchpriority="high" />
   </head>
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
+

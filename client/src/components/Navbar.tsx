@@ -10,6 +10,7 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import EditModalOverlay from "./EditModalOverlay";
+import { optimizeCloudinaryUrl } from "../utils/cloudinary";
 
 interface NavbarProps {
   whiteLogo?: boolean;
@@ -75,7 +76,7 @@ const Navbar = ({}: NavbarProps) => {
 
   // Fetch the current logo from dynamic content
   useEffect(() => {
-    fetch("https://api.gevify.media/api/content")
+    fetch("http://localhost:5000/api/content")
       .then((res) => res.json())
       .then((data) => {
         if (data && data.logo) setLogoUrl(data.logo);
@@ -89,14 +90,17 @@ const Navbar = ({}: NavbarProps) => {
     setLogoMsg(null);
     const token = localStorage.getItem("adminToken");
     try {
-      const res = await fetch("https://api.gevify.media/api/content/logo", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const res = await fetch(
+        "http://localhost:5000/api/content/logo",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ logo: logoInput.trim() }),
         },
-        body: JSON.stringify({ logo: logoInput.trim() }),
-      });
+      );
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.message || "Failed to update logo");
@@ -146,9 +150,12 @@ const Navbar = ({}: NavbarProps) => {
           title="BroEditz"
         >
           <img
-            src={logoUrl}
+            src={optimizeCloudinaryUrl(logoUrl, 160)}
             alt="BroEditz logo"
             className="h-7 sm:h-8 md:h-9 w-auto object-contain"
+            fetchPriority="high"
+            width="160"
+            height="107"
           />
         </button>
 

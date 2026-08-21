@@ -1,21 +1,21 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { 
-  User, 
-  FileText, 
-  Users, 
-  LogOut, 
-  ShieldAlert, 
-  CheckSquare, 
-  Square, 
-  Lock, 
-  KeyRound, 
-  Mail, 
-  Camera, 
-  Check, 
+import {
+  User,
+  FileText,
+  Users,
+  LogOut,
+  ShieldAlert,
+  CheckSquare,
+  Square,
+  Lock,
+  KeyRound,
+  Mail,
+  Camera,
+  Check,
   AlertCircle,
   Search,
-  ChevronDown
+  ChevronDown,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 
@@ -41,7 +41,9 @@ interface Application {
 
 const AdminProfile = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<"profile" | "applications" | "team">("profile");
+  const [activeTab, setActiveTab] = useState<
+    "profile" | "applications" | "team"
+  >("profile");
 
   // User state
   const [user, setUser] = useState<AdminUser | null>(null);
@@ -54,13 +56,19 @@ const AdminProfile = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [profileMsg, setProfileMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [profileMsg, setProfileMsg] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
   const [updatingProfile, setUpdatingProfile] = useState(false);
 
   // Superadmin Signup Code state
   const [signupCode, setSignupCode] = useState("");
   const [newSignupCode, setNewSignupCode] = useState("");
-  const [codeMsg, setCodeMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [codeMsg, setCodeMsg] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
   const [updatingCode, setUpdatingCode] = useState(false);
 
   // Applications state
@@ -69,7 +77,9 @@ const AdminProfile = () => {
 
   // Applications filters
   const [searchTerm, setSearchTerm] = useState("");
-  const [checkedFilter, setCheckedFilter] = useState<"all" | "checked" | "unchecked">("unchecked");
+  const [checkedFilter, setCheckedFilter] = useState<
+    "all" | "checked" | "unchecked"
+  >("unchecked");
   const [sortBy, setSortBy] = useState<"recent" | "first">("recent");
   const [checkedFilterOpen, setCheckedFilterOpen] = useState(false);
   const [sortByOpen, setSortByOpen] = useState(false);
@@ -89,8 +99,8 @@ const AdminProfile = () => {
 
     const fetchMe = async () => {
       try {
-        const res = await fetch("https://api.gevify.media/api/admin/me", {
-          headers: { Authorization: `Bearer ${token}` }
+        const res = await fetch("http://localhost:5000/api/admin/me", {
+          headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) {
           localStorage.removeItem("adminToken");
@@ -115,8 +125,8 @@ const AdminProfile = () => {
   // Fetch signup code if superadmin
   useEffect(() => {
     if (user && user.role === "superadmin" && activeTab === "profile") {
-      fetch("https://api.gevify.media/api/admin/signup-code", {
-        headers: { Authorization: `Bearer ${token}` }
+      fetch("http://localhost:5000/api/admin/signup-code", {
+        headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => res.json())
         .then((data) => {
@@ -130,8 +140,8 @@ const AdminProfile = () => {
   useEffect(() => {
     if (activeTab === "applications" && token) {
       setLoadingApps(true);
-      fetch("https://api.gevify.media/api/admin/applications", {
-        headers: { Authorization: `Bearer ${token}` }
+      fetch("http://localhost:5000/api/admin/applications", {
+        headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => res.json())
         .then((data) => {
@@ -146,8 +156,8 @@ const AdminProfile = () => {
   useEffect(() => {
     if (activeTab === "team" && token) {
       setLoadingTeam(true);
-      fetch("https://api.gevify.media/api/admin/team", {
-        headers: { Authorization: `Bearer ${token}` }
+      fetch("http://localhost:5000/api/admin/team", {
+        headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => res.json())
         .then((data) => {
@@ -175,20 +185,23 @@ const AdminProfile = () => {
 
     setUpdatingProfile(true);
     try {
-      const res = await fetch("https://api.gevify.media/api/admin/profile", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+      const res = await fetch(
+        "http://localhost:5000/api/admin/profile",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            avatar: avatarUrl,
+            currentPassword: currentPassword || undefined,
+            newPassword: newPassword || undefined,
+          }),
         },
-        body: JSON.stringify({
-          name,
-          email,
-          avatar: avatarUrl,
-          currentPassword: currentPassword || undefined,
-          newPassword: newPassword || undefined
-        })
-      });
+      );
 
       const data = await res.json();
       if (!res.ok) {
@@ -201,7 +214,10 @@ const AdminProfile = () => {
       setNewPassword("");
       setConfirmPassword("");
     } catch (err: any) {
-      setProfileMsg({ type: "error", text: err.message || "Error updating profile" });
+      setProfileMsg({
+        type: "error",
+        text: err.message || "Error updating profile",
+      });
     } finally {
       setUpdatingProfile(false);
     }
@@ -218,14 +234,17 @@ const AdminProfile = () => {
 
     setUpdatingCode(true);
     try {
-      const res = await fetch("https://api.gevify.media/api/admin/signup-code", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+      const res = await fetch(
+        "http://localhost:5000/api/admin/signup-code",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ signupCode: newSignupCode.trim() }),
         },
-        body: JSON.stringify({ signupCode: newSignupCode.trim() })
-      });
+      );
 
       const data = await res.json();
       if (!res.ok) {
@@ -234,9 +253,15 @@ const AdminProfile = () => {
 
       setSignupCode(data.signupCode);
       setNewSignupCode("");
-      setCodeMsg({ type: "success", text: "Signup code updated successfully!" });
+      setCodeMsg({
+        type: "success",
+        text: "Signup code updated successfully!",
+      });
     } catch (err: any) {
-      setCodeMsg({ type: "error", text: err.message || "Error updating signup code" });
+      setCodeMsg({
+        type: "error",
+        text: err.message || "Error updating signup code",
+      });
     } finally {
       setUpdatingCode(false);
     }
@@ -245,13 +270,18 @@ const AdminProfile = () => {
   // Toggle application checkbox
   const handleToggleCheck = async (id: string) => {
     try {
-      const res = await fetch(`https://api.gevify.media/api/admin/applications/${id}/check`, {
-        method: "PUT",
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await fetch(
+        `http://localhost:5000/api/admin/applications/${id}/check`,
+        {
+          method: "PUT",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       if (res.ok) {
         setApplications((prev) =>
-          prev.map((app) => (app._id === id ? { ...app, checked: !app.checked } : app))
+          prev.map((app) =>
+            app._id === id ? { ...app, checked: !app.checked } : app,
+          ),
         );
       }
     } catch (err) {
@@ -264,20 +294,23 @@ const AdminProfile = () => {
     // Confirm before transferring superadmin
     if (newRole === "superadmin") {
       const confirmed = window.confirm(
-        "⚠️ Transfer Superadmin Role?\n\nYou will be demoted to Admin and the selected user will become the new Superadmin. This cannot be undone easily.\n\nContinue?"
+        "⚠️ Transfer Superadmin Role?\n\nYou will be demoted to Admin and the selected user will become the new Superadmin. This cannot be undone easily.\n\nContinue?",
       );
       if (!confirmed) return;
     }
 
     try {
-      const res = await fetch("https://api.gevify.media/api/admin/team/role", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+      const res = await fetch(
+        "http://localhost:5000/api/admin/team/role",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ memberId, role: newRole }),
         },
-        body: JSON.stringify({ memberId, role: newRole })
-      });
+      );
 
       const data = await res.json();
       if (!res.ok) {
@@ -287,16 +320,18 @@ const AdminProfile = () => {
 
       setTeam((prev) => {
         let updated = prev.map((m) =>
-          m._id === memberId ? { ...m, role: data.member.role } : m
+          m._id === memberId ? { ...m, role: data.member.role } : m,
         );
         // If a superadmin transfer happened, also demote the old superadmin in local state
         if (data.demotedMember) {
           updated = updated.map((m) =>
-            m._id === data.demotedMember._id ? { ...m, role: data.demotedMember.role } : m
+            m._id === data.demotedMember._id
+              ? { ...m, role: data.demotedMember.role }
+              : m,
           );
           // If the current user was the one demoted, update their local user state too
           if (user && data.demotedMember._id === user._id) {
-            setUser((prev) => prev ? { ...prev, role: "admin" } : prev);
+            setUser((prev) => (prev ? { ...prev, role: "admin" } : prev));
           }
         }
         return updated;
@@ -313,7 +348,8 @@ const AdminProfile = () => {
       if (checkedFilter === "checked" && !app.checked) return false;
       if (checkedFilter === "unchecked" && app.checked) return false;
       if (query) {
-        const haystack = `${app.name} ${app.contact} ${app.videoType} ${app.budget}`.toLowerCase();
+        const haystack =
+          `${app.name} ${app.contact} ${app.videoType} ${app.budget}`.toLowerCase();
         if (!haystack.includes(query)) return false;
       }
       return true;
@@ -333,7 +369,9 @@ const AdminProfile = () => {
           <div className="absolute inset-0 rounded-full border-2 border-[#0086F0]/20"></div>
           <div className="w-10 h-10 border-2 border-transparent border-t-[#0086F0] rounded-full animate-spin" />
         </div>
-        <p className="text-sm text-[#5ACFFE]/80 tracking-widest uppercase font-medium">Loading...</p>
+        <p className="text-sm text-[#5ACFFE]/80 tracking-widest uppercase font-medium">
+          Loading...
+        </p>
       </div>
     );
   }
@@ -351,14 +389,20 @@ const AdminProfile = () => {
             {/* Admin Avatar & Brief */}
             <div className="flex items-center gap-3 lg:gap-4 pb-0 lg:pb-6 border-b-0 lg:border-b border-white/10 lg:w-full">
               {user?.avatar ? (
-                <img src={user.avatar} alt={user.name} className="w-10 h-10 lg:w-12 lg:h-12 rounded-full object-cover border border-[#0086F0]/50" />
+                <img
+                  src={user.avatar}
+                  alt={user.name}
+                  className="w-10 h-10 lg:w-12 lg:h-12 rounded-full object-cover border border-[#0086F0]/50"
+                />
               ) : (
                 <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-gradient-to-tr from-[#0086F0] to-[#7C5CFF] flex items-center justify-center font-bold text-base lg:text-lg text-white shadow-lg shrink-0">
                   {user?.name?.charAt(0).toUpperCase() || "A"}
                 </div>
               )}
               <div className="overflow-hidden min-w-0">
-                <h3 className="text-sm lg:text-base font-bold text-white truncate">{user?.name}</h3>
+                <h3 className="text-sm lg:text-base font-bold text-white truncate">
+                  {user?.name}
+                </h3>
                 <span className="text-[11px] font-semibold text-[#5ACFFE] uppercase tracking-wider px-2 py-0.5 bg-[#0086F0]/15 rounded border border-[#0086F0]/30 inline-block mt-0.5">
                   {user?.role}
                 </span>
@@ -425,8 +469,12 @@ const AdminProfile = () => {
           {activeTab === "profile" && (
             <div className="w-full space-y-10">
               <div>
-                <h1 className="text-2xl font-bold text-white tracking-tight">Admin Profile</h1>
-                <p className="text-sm text-zinc-400 mt-1">Manage your account information and password settings</p>
+                <h1 className="text-2xl font-bold text-white tracking-tight">
+                  Admin Profile
+                </h1>
+                <p className="text-sm text-zinc-400 mt-1">
+                  Manage your account information and password settings
+                </p>
               </div>
 
               {profileMsg && (
@@ -437,7 +485,11 @@ const AdminProfile = () => {
                       : "bg-red-500/10 border-red-500/30 text-red-400"
                   }`}
                 >
-                  {profileMsg.type === "success" ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+                  {profileMsg.type === "success" ? (
+                    <Check className="w-4 h-4" />
+                  ) : (
+                    <AlertCircle className="w-4 h-4" />
+                  )}
                   <span>{profileMsg.text}</span>
                 </div>
               )}
@@ -446,7 +498,8 @@ const AdminProfile = () => {
                 {/* Profile Image URL */}
                 <div className="space-y-2">
                   <label className="text-xs font-semibold uppercase text-zinc-400 tracking-wider flex items-center gap-2">
-                    <Camera className="w-3.5 h-3.5 text-[#5ACFFE]" /> Profile Image URL
+                    <Camera className="w-3.5 h-3.5 text-[#5ACFFE]" /> Profile
+                    Image URL
                   </label>
                   <input
                     type="text"
@@ -474,7 +527,8 @@ const AdminProfile = () => {
                 {/* Email */}
                 <div className="space-y-2">
                   <label className="text-xs font-semibold uppercase text-zinc-400 tracking-wider flex items-center gap-2">
-                    <Mail className="w-3.5 h-3.5 text-[#5ACFFE]" /> Email Address
+                    <Mail className="w-3.5 h-3.5 text-[#5ACFFE]" /> Email
+                    Address
                   </label>
                   <input
                     type="email"
@@ -493,7 +547,9 @@ const AdminProfile = () => {
 
                   <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs text-zinc-400">Current Password</label>
+                      <label className="text-xs text-zinc-400">
+                        Current Password
+                      </label>
                       <input
                         type="password"
                         value={currentPassword}
@@ -504,7 +560,9 @@ const AdminProfile = () => {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-xs text-zinc-400">New Password</label>
+                      <label className="text-xs text-zinc-400">
+                        New Password
+                      </label>
                       <input
                         type="password"
                         value={newPassword}
@@ -515,7 +573,9 @@ const AdminProfile = () => {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-xs text-zinc-400">Confirm New Password</label>
+                      <label className="text-xs text-zinc-400">
+                        Confirm New Password
+                      </label>
                       <input
                         type="password"
                         value={confirmPassword}
@@ -547,9 +607,12 @@ const AdminProfile = () => {
                         <KeyRound className="w-5 h-5" />
                       </div>
                       <div>
-                        <h3 className="text-base font-bold text-white">Superadmin Setting: Admin Registration Code</h3>
+                        <h3 className="text-base font-bold text-white">
+                          Superadmin Setting: Admin Registration Code
+                        </h3>
                         <p className="text-xs text-zinc-400">
-                          Users require this security code to create an admin account. Only you can update it.
+                          Users require this security code to create an admin
+                          account. Only you can update it.
                         </p>
                       </div>
                     </div>
@@ -573,7 +636,10 @@ const AdminProfile = () => {
                       </div>
                     )}
 
-                    <form onSubmit={handleUpdateSignupCode} className="flex flex-col sm:flex-row gap-3 pt-2">
+                    <form
+                      onSubmit={handleUpdateSignupCode}
+                      className="flex flex-col sm:flex-row gap-3 pt-2"
+                    >
                       <input
                         type="text"
                         placeholder="Enter new registration code..."
@@ -599,8 +665,12 @@ const AdminProfile = () => {
           {activeTab === "applications" && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl font-bold text-white tracking-tight">Submitted Applications</h1>
-                <p className="text-sm text-zinc-400 mt-1">Review contact form inquiries submitted by clients</p>
+                <h1 className="text-2xl font-bold text-white tracking-tight">
+                  Submitted Applications
+                </h1>
+                <p className="text-sm text-zinc-400 mt-1">
+                  Review contact form inquiries submitted by clients
+                </p>
               </div>
 
               {/* Filter bar */}
@@ -627,7 +697,9 @@ const AdminProfile = () => {
                     className="flex items-center justify-between gap-6 px-4 py-2.5 rounded-xl bg-white/[0.06] border border-white/10 text-sm text-white hover:border-[#0086F0]/60 transition-colors cursor-pointer min-w-[140px]"
                   >
                     <span className="capitalize">{checkedFilter}</span>
-                    <ChevronDown className={`w-4 h-4 text-zinc-500 transition-transform ${checkedFilterOpen ? "rotate-180" : ""}`} />
+                    <ChevronDown
+                      className={`w-4 h-4 text-zinc-500 transition-transform ${checkedFilterOpen ? "rotate-180" : ""}`}
+                    />
                   </button>
                   {checkedFilterOpen && (
                     <div className="absolute z-30 mt-2 w-full min-w-[140px] bg-[#0B1533] border border-white/10 rounded-xl py-1.5 shadow-2xl">
@@ -661,7 +733,9 @@ const AdminProfile = () => {
                     className="flex items-center justify-between gap-6 px-4 py-2.5 rounded-xl bg-white/[0.06] border border-white/10 text-sm text-white hover:border-[#0086F0]/60 transition-colors cursor-pointer min-w-[140px]"
                   >
                     <span className="capitalize">{sortBy}</span>
-                    <ChevronDown className={`w-4 h-4 text-zinc-500 transition-transform ${sortByOpen ? "rotate-180" : ""}`} />
+                    <ChevronDown
+                      className={`w-4 h-4 text-zinc-500 transition-transform ${sortByOpen ? "rotate-180" : ""}`}
+                    />
                   </button>
                   {sortByOpen && (
                     <div className="absolute z-30 mt-2 w-full min-w-[140px] bg-[#0B1533] border border-white/10 rounded-xl py-1.5 shadow-2xl">
@@ -687,20 +761,30 @@ const AdminProfile = () => {
               </div>
 
               {loadingApps ? (
-                <div className="py-12 text-center text-[#5ACFFE]/60 text-sm">Loading applications...</div>
+                <div className="py-12 text-center text-[#5ACFFE]/60 text-sm">
+                  Loading applications...
+                </div>
               ) : filteredApplications.length === 0 ? (
-                <div className="py-12 text-center text-zinc-500 text-sm">No applications match your filters.</div>
+                <div className="py-12 text-center text-zinc-500 text-sm">
+                  No applications match your filters.
+                </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-sm text-zinc-300">
                     <thead className="text-xs uppercase bg-white/5 text-zinc-400 border-b border-white/10">
                       <tr>
                         <th className="py-3.5 px-4 font-semibold">Checked</th>
-                        <th className="py-3.5 px-4 font-semibold">Client Name</th>
+                        <th className="py-3.5 px-4 font-semibold">
+                          Client Name
+                        </th>
                         <th className="py-3.5 px-4 font-semibold">Videos</th>
-                        <th className="py-3.5 px-4 font-semibold">Video Type</th>
+                        <th className="py-3.5 px-4 font-semibold">
+                          Video Type
+                        </th>
                         <th className="py-3.5 px-4 font-semibold">Budget</th>
-                        <th className="py-3.5 px-4 font-semibold">Contact Info</th>
+                        <th className="py-3.5 px-4 font-semibold">
+                          Contact Info
+                        </th>
                         <th className="py-3.5 px-4 font-semibold">Date</th>
                       </tr>
                     </thead>
@@ -716,7 +800,11 @@ const AdminProfile = () => {
                             <button
                               onClick={() => handleToggleCheck(app._id)}
                               className="text-[#5ACFFE] hover:text-[#0086F0] transition-colors cursor-pointer"
-                              title={app.checked ? "Mark as unchecked" : "Mark as checked"}
+                              title={
+                                app.checked
+                                  ? "Mark as unchecked"
+                                  : "Mark as checked"
+                              }
                             >
                               {app.checked ? (
                                 <CheckSquare className="w-5 h-5" />
@@ -725,13 +813,19 @@ const AdminProfile = () => {
                               )}
                             </button>
                           </td>
-                          <td className="py-4 px-4 font-semibold text-white">{app.name}</td>
+                          <td className="py-4 px-4 font-semibold text-white">
+                            {app.name}
+                          </td>
                           <td className="py-4 px-4">{app.videoCount}</td>
                           <td className="py-4 px-4">{app.videoType}</td>
-                          <td className="py-4 px-4 font-medium text-[#5ACFFE]">{app.budget}</td>
+                          <td className="py-4 px-4 font-medium text-[#5ACFFE]">
+                            {app.budget}
+                          </td>
                           <td className="py-4 px-4">
                             <div className="flex flex-col">
-                              <span className="text-xs uppercase font-bold text-zinc-400">{app.contactMethod}</span>
+                              <span className="text-xs uppercase font-bold text-zinc-400">
+                                {app.contactMethod}
+                              </span>
                               <span className="text-white">{app.contact}</span>
                             </div>
                           </td>
@@ -751,14 +845,19 @@ const AdminProfile = () => {
           {activeTab === "team" && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl font-bold text-white tracking-tight">Manage Team & Roles</h1>
+                <h1 className="text-2xl font-bold text-white tracking-tight">
+                  Manage Team & Roles
+                </h1>
                 <p className="text-sm text-zinc-400 mt-1">
-                  Manage user roles (Superadmin, Admin, Moderator). Newly registered accounts start as Moderator.
+                  Manage user roles (Superadmin, Admin, Moderator). Newly
+                  registered accounts start as Moderator.
                 </p>
               </div>
 
               {loadingTeam ? (
-                <div className="py-12 text-center text-[#5ACFFE]/60 text-sm">Loading team members...</div>
+                <div className="py-12 text-center text-[#5ACFFE]/60 text-sm">
+                  Loading team members...
+                </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-sm text-zinc-300">
@@ -766,8 +865,12 @@ const AdminProfile = () => {
                       <tr>
                         <th className="py-3.5 px-4 font-semibold">User</th>
                         <th className="py-3.5 px-4 font-semibold">Email</th>
-                        <th className="py-3.5 px-4 font-semibold">Current Role</th>
-                        <th className="py-3.5 px-4 font-semibold">Action / Change Role</th>
+                        <th className="py-3.5 px-4 font-semibold">
+                          Current Role
+                        </th>
+                        <th className="py-3.5 px-4 font-semibold">
+                          Action / Change Role
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
@@ -783,26 +886,37 @@ const AdminProfile = () => {
                         }
 
                         return (
-                          <tr key={member._id} className="hover:bg-white/[0.02] transition-colors">
+                          <tr
+                            key={member._id}
+                            className="hover:bg-white/[0.02] transition-colors"
+                          >
                             <td className="py-4 px-4 flex items-center gap-3">
                               {member.avatar ? (
-                                <img src={member.avatar} alt={member.name} className="w-8 h-8 rounded-full object-cover" />
+                                <img
+                                  src={member.avatar}
+                                  alt={member.name}
+                                  className="w-8 h-8 rounded-full object-cover"
+                                />
                               ) : (
                                 <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#0086F0] to-[#7C5CFF] flex items-center justify-center font-bold text-xs text-white">
                                   {member.name?.charAt(0).toUpperCase()}
                                 </div>
                               )}
-                              <span className="font-semibold text-white">{member.name} {isSelf && "(You)"}</span>
+                              <span className="font-semibold text-white">
+                                {member.name} {isSelf && "(You)"}
+                              </span>
                             </td>
-                            <td className="py-4 px-4 text-zinc-400">{member.email}</td>
+                            <td className="py-4 px-4 text-zinc-400">
+                              {member.email}
+                            </td>
                             <td className="py-4 px-4">
                               <span
                                 className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded border ${
                                   member.role === "superadmin"
                                     ? "bg-purple-500/10 border-purple-500/30 text-purple-400"
                                     : member.role === "admin"
-                                    ? "bg-[#0086F0]/15 border-[#0086F0]/30 text-[#5ACFFE]"
-                                    : "bg-blue-500/10 border-blue-500/30 text-blue-400"
+                                      ? "bg-[#0086F0]/15 border-[#0086F0]/30 text-[#5ACFFE]"
+                                      : "bg-blue-500/10 border-blue-500/30 text-blue-400"
                                 }`}
                               >
                                 {member.role}
@@ -811,20 +925,27 @@ const AdminProfile = () => {
                             <td className="py-4 px-4">
                               {isSuperAdmin ? (
                                 <span className="text-xs text-zinc-500 italic flex items-center gap-1">
-                                  <ShieldAlert className="w-3.5 h-3.5 text-purple-400" /> Protected Role
+                                  <ShieldAlert className="w-3.5 h-3.5 text-purple-400" />{" "}
+                                  Protected Role
                                 </span>
                               ) : canEdit ? (
                                 <select
                                   value={member.role}
-                                  onChange={(e) => handleRoleChange(member._id, e.target.value)}
+                                  onChange={(e) =>
+                                    handleRoleChange(member._id, e.target.value)
+                                  }
                                   className="bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#0086F0] cursor-pointer"
                                 >
                                   <option value="moderator">Moderator</option>
                                   <option value="admin">Admin</option>
-                                  <option value="superadmin">⚠️ Transfer Superadmin</option>
+                                  <option value="superadmin">
+                                    ⚠️ Transfer Superadmin
+                                  </option>
                                 </select>
                               ) : (
-                                <span className="text-xs text-zinc-600">No permission</span>
+                                <span className="text-xs text-zinc-600">
+                                  No permission
+                                </span>
                               )}
                             </td>
                           </tr>

@@ -38,7 +38,7 @@ const Faq = ({
   useEffect(() => {
     if (!active) {
       gsap.set(titleRef.current, { y: 40, opacity: 0 });
-      if (listRef.current)
+      if (listRef.current && listRef.current.children.length > 0)
         gsap.set(listRef.current.children, { y: 50, opacity: 0 });
       return;
     }

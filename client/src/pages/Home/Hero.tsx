@@ -1,11 +1,12 @@
 // Hero.tsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Ai from '../../components/animations/Ai';
-import AiMobile from '../../components/animations/Ai_mobile';
-import backgroundImage from '../../assets/images/background.jpg';
+import backgroundImage from '../../assets/images/background.webp';
 import { Pencil } from 'lucide-react';
+
+const Ai = lazy(() => import('../../components/animations/Ai'));
+const AiMobile = lazy(() => import('../../components/animations/Ai_mobile'));
 
 interface HeroProps {
   standalone?: boolean;
@@ -187,14 +188,18 @@ const Hero: React.FC<HeroProps> = ({
         {/* Mobile AI animation (sm + md) */}
         <div className="flex lg:hidden absolute bottom-0 left-0 right-0 w-full z-0 justify-center pointer-events-none">
           <div className="w-full origin-bottom scale-160 xs:scale-160 sm:scale-160 md:scale-160">
-            <AiMobile />
+            <Suspense fallback={null}>
+              <AiMobile />
+            </Suspense>
           </div>
         </div>
 
         {/* Desktop AI animation (lg+) */}
         <div className="hidden lg:flex absolute bottom-0 left-0 right-0 w-full z-0 justify-center pointer-events-none">
           <div className="w-full origin-bottom scale-[3] xs:scale-[2] sm:scale-[3] md:scale-[3] lg:scale-100 xl:scale-100">
-            <Ai />
+            <Suspense fallback={null}>
+              <Ai />
+            </Suspense>
           </div>
         </div>
       </div>

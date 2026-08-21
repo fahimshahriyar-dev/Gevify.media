@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import EditModalOverlay from "./EditModalOverlay";
-import PhoneNumberInput, {
-  isValidWhatsAppNumber,
-} from "./PhoneNumberInput";
+import PhoneNumberInput, { isValidWhatsAppNumber } from "./PhoneNumberInput";
 import { Pencil, Image as ImageIcon } from "lucide-react";
-import footerBg from "../assets/images/footer_bg.jpg";
+import footerBg from "../assets/images/footer_bg.webp";
+import { optimizeCloudinaryUrl } from "../utils/cloudinary";
 
 interface FooterProps {
   isAdminMode?: boolean;
@@ -61,7 +60,7 @@ const Footer = ({ isAdminMode = false }: FooterProps) => {
 
   // Load dynamic footer content
   useEffect(() => {
-    fetch("https://api.gevify.media/api/content")
+    fetch("http://localhost:5000/api/content")
       .then((res) => res.json())
       .then((data) => {
         if (data.logo) setLogo(data.logo);
@@ -95,14 +94,17 @@ const Footer = ({ isAdminMode = false }: FooterProps) => {
     setSaving(true);
     const token = localStorage.getItem("adminToken");
     try {
-      const res = await fetch("https://api.gevify.media/api/content/footer", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const res = await fetch(
+        "http://localhost:5000/api/content/footer",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ footer: draft }),
         },
-        body: JSON.stringify({ footer: draft }),
-      });
+      );
       if (!res.ok) throw new Error("Save failed");
       const data = await res.json();
       if (data.footer) {
@@ -118,14 +120,17 @@ const Footer = ({ isAdminMode = false }: FooterProps) => {
       }
 
       if (draftLogo.trim()) {
-        const logoRes = await fetch("https://api.gevify.media/api/content/logo", {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+        const logoRes = await fetch(
+          "http://localhost:5000/api/content/logo",
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ logo: draftLogo.trim() }),
           },
-          body: JSON.stringify({ logo: draftLogo.trim() }),
-        });
+        );
         if (!logoRes.ok) throw new Error("Failed to save logo");
         const logoData = await logoRes.json();
         if (logoData.logo) setLogo(logoData.logo);
@@ -168,14 +173,17 @@ const Footer = ({ isAdminMode = false }: FooterProps) => {
     setSubmitSuccess(false);
 
     try {
-      const response = await fetch("https://api.gevify.media/api/applications", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          contactMethod,
-        }),
-      });
+      const response = await fetch(
+        "http://localhost:5000/api/applications",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...formData,
+            contactMethod,
+          }),
+        },
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -231,7 +239,7 @@ const Footer = ({ isAdminMode = false }: FooterProps) => {
           <div className="space-y-5">
             <div className="flex items-center gap-3">
               <img
-                src={logo}
+                src={optimizeCloudinaryUrl(logo, 160)}
                 alt="Brand logo"
                 className="h-10 w-auto object-contain"
               />
@@ -479,9 +487,7 @@ const Footer = ({ isAdminMode = false }: FooterProps) => {
                 {contactMethod === "whatsapp" ? (
                   <PhoneNumberInput
                     value={formData.contact}
-                    onChange={(v) =>
-                      handleInputChange("contact", v ?? "")
-                    }
+                    onChange={(v) => handleInputChange("contact", v ?? "")}
                     placeholder="Enter your WhatsApp number..."
                   />
                 ) : (
@@ -529,7 +535,10 @@ const Footer = ({ isAdminMode = false }: FooterProps) => {
         {/* ── BOTTOM SECTION — Credits ── */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-10 text-[12.5px] text-zinc-500">
           <div className="space-y-1.5 text-center md:text-left leading-relaxed">
-            <p>© All Rights Reserved | {footer.brand} 2026 | Designed & Developed by Fahim Shahriyar Mugdho</p>
+            <p>
+              © All Rights Reserved | {footer.brand} 2026 | Designed & Developed
+              by Fahim Shahriyar Mugdho
+            </p>
           </div>
         </div>
       </div>

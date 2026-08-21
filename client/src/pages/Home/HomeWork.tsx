@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { createPortal } from "react-dom";
-import Slider from "../../components/animations/Slider";
 import { ArrowLeft, ArrowRight, X, Video } from "lucide-react";
+
+const Slider = lazy(() => import("../../components/animations/Slider"));
 
 interface HomeWorkProps {
   onGoToSolution?: () => void;
@@ -54,21 +55,20 @@ const HomeWork = ({
         aria-hidden="true"
       />
 
-      <Slider workVideos={workVideos} />
+      <Suspense fallback={null}>
+        <Slider workVideos={workVideos} />
+      </Suspense>
 
-      {/* Navigation links at bottom corners */}
+      {/* Navigation links at bottom corners - hidden on sm & md, visible on lg */}
       <button
         onClick={() =>
           window.dispatchEvent(
             new CustomEvent("goto-section", { detail: "hero" }),
           )
         }
-        className="absolute bottom-8 left-12 flex items-center gap-2 text-slate-600 hover:text-slate-950 font-semibold transition-colors z-20 cursor-pointer group"
+        className="absolute bottom-8 left-12 hidden lg:flex items-center gap-2 text-slate-600 hover:text-slate-950 font-semibold transition-colors z-20 cursor-pointer group"
       >
         <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
-        <span className="hidden md:inline lg:hidden text-xs font-semibold tracking-widest uppercase">
-          Prev
-        </span>
         <span className="hidden lg:inline text-xs font-semibold tracking-widest uppercase">
           Previous Page
         </span>
@@ -82,11 +82,8 @@ const HomeWork = ({
 
       <button
         onClick={onGoToSolution}
-        className="absolute bottom-8 right-12 flex items-center gap-2 text-slate-600 hover:text-slate-950 font-semibold transition-colors z-20 cursor-pointer group"
+        className="absolute bottom-8 right-12 hidden lg:flex items-center gap-2 text-slate-600 hover:text-slate-950 font-semibold transition-colors z-20 cursor-pointer group"
       >
-        <span className="hidden md:inline lg:hidden text-xs font-semibold tracking-widest uppercase">
-          Next
-        </span>
         <span className="hidden lg:inline text-xs font-semibold tracking-widest uppercase">
           Next Page
         </span>

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://fahimshahriyardev_db_user:yAsfA0twNmLVYBUi@development.noel1vx.mongodb.net/broeditz?retryWrites=true&w=majority";
+const MONGODB_URI = process.env.MONGODB_URI || process.env.MONGO_URI || "mongodb+srv://fahimshahriyardev_db_user:yAsfA0twNmLVYBUi@development.noel1vx.mongodb.net/broeditz?retryWrites=true&w=majority";
 
 export const connectDB = async () => {
   try {

@@ -136,12 +136,29 @@ interface SliderProps {
 
 const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
   const mountRef = useRef<HTMLDivElement>(null);
-  // Direct ref to overlay DOM node — position is set via inline style each frame (no React re-renders)
   const overlayDivRef = useRef<HTMLDivElement>(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [activeCardIndex, setActiveCardIndex] = useState<number>(-1);
 
-  // Utility to extract YouTube embed URL
+  // Responsive state to detect lg devices
+  const [isLg, setIsLg] = useState<boolean>(() =>
+    typeof window !== "undefined"
+      ? window.matchMedia("(min-width: 1024px)").matches
+      : true,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const handler = (e: MediaQueryListEvent) => setIsLg(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  const isLgRef = useRef(isLg);
+  useEffect(() => {
+    isLgRef.current = isLg;
+  }, [isLg]);
+
   const getEmbedUrl = (url: string) => {
     if (!url) return "";
     let videoId = "";
@@ -157,7 +174,6 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
     return `https://www.youtube.com/embed/${videoId}?autoplay=1`;
   };
 
-  // Build image URL list: prefer YouTube thumbnail, fall back to picsum
   const imageUrls = Array.from({ length: 12 }, (_, i) => {
     const videoUrl = workVideos[i];
     const thumb = videoUrl ? getYouTubeThumbnail(videoUrl) : null;
@@ -255,6 +271,7 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
 
     // --- Wheel: slow and smooth ---
     const handleWheel = (e: WheelEvent) => {
+      if (!isLgRef.current) return;
       e.stopPropagation();
       applyDelta(-e.deltaY); // inverted: scroll down = negative delta
     };
@@ -277,9 +294,11 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
     }
 
     const handleTouchStart = (e: TouchEvent) => {
+      if (!isLgRef.current) return;
       e.stopPropagation();
     };
     const handleTouchEnd = (e: TouchEvent) => {
+      if (!isLgRef.current) return;
       e.stopPropagation();
     };
 
@@ -305,6 +324,7 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
       const dy = e.clientY - lastY;
       lastY = e.clientY;
       dragDistance += Math.abs(dy);
+      if (!isLgRef.current) return;
       applyDelta(-dy * 1.2); // drag down = negative delta (top-to-bottom)
     };
 
@@ -617,7 +637,7 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
 
   return (
     <div className="absolute inset-0 w-full h-full bg-transparent flex flex-col items-center justify-center z-10">
-      <div ref={mountRef} className="w-full h-full touch-none" />
+      <div ref={mountRef} className={`w-full h-full ${isLg ? "touch-none" : "touch-pan-y"}`} />
 
       {/* Overlay div: always in DOM, position+size set each frame by syncOverlay(), opacity driven by CSS transition */}
       <div
