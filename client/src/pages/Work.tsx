@@ -66,7 +66,7 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
   const pageVideos = workVideos.slice(pageStart, pageStart + PAGE_SIZE);
 
   const fetchWorkPage = () => {
-    fetch("http://localhost:5000/api/content")
+    fetch("https://api.gevify.media/api/content")
       .then((res) => res.json())
       .then((data) => {
         if (data.workPage) {
@@ -158,7 +158,7 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const res = await fetch(
-        "http://localhost:5000/api/content/work-page",
+        "https://api.gevify.media/api/content/work-page",
         {
           method: "PUT",
           headers: {

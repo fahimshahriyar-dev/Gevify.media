@@ -60,7 +60,7 @@ const Footer = ({ isAdminMode = false }: FooterProps) => {
 
   // Load dynamic footer content
   useEffect(() => {
-    fetch("http://localhost:5000/api/content")
+    fetch("https://api.gevify.media/api/content")
       .then((res) => res.json())
       .then((data) => {
         if (data.logo) setLogo(data.logo);
@@ -95,7 +95,7 @@ const Footer = ({ isAdminMode = false }: FooterProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const res = await fetch(
-        "http://localhost:5000/api/content/footer",
+        "https://api.gevify.media/api/content/footer",
         {
           method: "PUT",
           headers: {
@@ -121,7 +121,7 @@ const Footer = ({ isAdminMode = false }: FooterProps) => {
 
       if (draftLogo.trim()) {
         const logoRes = await fetch(
-          "http://localhost:5000/api/content/logo",
+          "https://api.gevify.media/api/content/logo",
           {
             method: "PUT",
             headers: {
@@ -174,7 +174,7 @@ const Footer = ({ isAdminMode = false }: FooterProps) => {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/applications",
+        "https://api.gevify.media/api/applications",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

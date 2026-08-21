@@ -73,7 +73,7 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
 
   // Load dynamic contact content
   useEffect(() => {
-    fetch("http://localhost:5000/api/content")
+    fetch("https://api.gevify.media/api/content")
       .then((res) => res.json())
       .then((data) => {
         if (data.logo) {
@@ -168,7 +168,7 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
     const token = localStorage.getItem("adminToken");
     try {
       const res = await fetch(
-        "http://localhost:5000/api/content/contact",
+        "https://api.gevify.media/api/content/contact",
         {
           method: "PUT",
           headers: {
@@ -203,7 +203,7 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
       if (draftLogo.trim() && draftLogo.trim() !== logo) {
         try {
           const logoRes = await fetch(
-            "http://localhost:5000/api/content/logo",
+            "https://api.gevify.media/api/content/logo",
             {
               method: "PUT",
               headers: {
@@ -289,7 +289,7 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/applications",
+        "https://api.gevify.media/api/applications",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

@@ -99,7 +99,7 @@ const AdminProfile = () => {
 
     const fetchMe = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/admin/me", {
+        const res = await fetch("https://api.gevify.media/api/admin/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) {
@@ -125,7 +125,7 @@ const AdminProfile = () => {
   // Fetch signup code if superadmin
   useEffect(() => {
     if (user && user.role === "superadmin" && activeTab === "profile") {
-      fetch("http://localhost:5000/api/admin/signup-code", {
+      fetch("https://api.gevify.media/api/admin/signup-code", {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => res.json())
@@ -140,7 +140,7 @@ const AdminProfile = () => {
   useEffect(() => {
     if (activeTab === "applications" && token) {
       setLoadingApps(true);
-      fetch("http://localhost:5000/api/admin/applications", {
+      fetch("https://api.gevify.media/api/admin/applications", {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => res.json())
@@ -156,7 +156,7 @@ const AdminProfile = () => {
   useEffect(() => {
     if (activeTab === "team" && token) {
       setLoadingTeam(true);
-      fetch("http://localhost:5000/api/admin/team", {
+      fetch("https://api.gevify.media/api/admin/team", {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => res.json())
@@ -186,7 +186,7 @@ const AdminProfile = () => {
     setUpdatingProfile(true);
     try {
       const res = await fetch(
-        "http://localhost:5000/api/admin/profile",
+        "https://api.gevify.media/api/admin/profile",
         {
           method: "PUT",
           headers: {
@@ -235,7 +235,7 @@ const AdminProfile = () => {
     setUpdatingCode(true);
     try {
       const res = await fetch(
-        "http://localhost:5000/api/admin/signup-code",
+        "https://api.gevify.media/api/admin/signup-code",
         {
           method: "PUT",
           headers: {
@@ -271,7 +271,7 @@ const AdminProfile = () => {
   const handleToggleCheck = async (id: string) => {
     try {
       const res = await fetch(
-        `http://localhost:5000/api/admin/applications/${id}/check`,
+        `https://api.gevify.media/api/admin/applications/${id}/check`,
         {
           method: "PUT",
           headers: { Authorization: `Bearer ${token}` },
@@ -301,7 +301,7 @@ const AdminProfile = () => {
 
     try {
       const res = await fetch(
-        "http://localhost:5000/api/admin/team/role",
+        "https://api.gevify.media/api/admin/team/role",
         {
           method: "PUT",
           headers: {

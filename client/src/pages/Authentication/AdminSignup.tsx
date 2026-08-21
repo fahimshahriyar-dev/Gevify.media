@@ -32,7 +32,7 @@ const AdminSignup: React.FC = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/admin/signup",
+        "https://api.gevify.media/api/admin/signup",
         {
           method: "POST",
           headers: {

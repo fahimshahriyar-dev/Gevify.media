@@ -182,7 +182,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
   // Fetch dynamic content
   const fetchContent = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/content");
+      const response = await fetch("https://api.gevify.media/api/content");
       if (!response.ok) {
         throw new Error("Failed to load website content");
       }
@@ -249,7 +249,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const response = await fetch(
-        "http://localhost:5000/api/content/hero",
+        "https://api.gevify.media/api/content/hero",
         {
           method: "PUT",
           headers: {
@@ -278,7 +278,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const response = await fetch(
-        "http://localhost:5000/api/content/work-videos",
+        "https://api.gevify.media/api/content/work-videos",
         {
           method: "PUT",
           headers: {
@@ -310,7 +310,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const response = await fetch(
-        "http://localhost:5000/api/content/solution",
+        "https://api.gevify.media/api/content/solution",
         {
           method: "PUT",
           headers: {
@@ -343,7 +343,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const response = await fetch(
-        "http://localhost:5000/api/content/reviews",
+        "https://api.gevify.media/api/content/reviews",
         {
           method: "PUT",
           headers: {
@@ -372,7 +372,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const response = await fetch(
-        "http://localhost:5000/api/content/faqs",
+        "https://api.gevify.media/api/content/faqs",
         {
           method: "PUT",
           headers: {
@@ -401,7 +401,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const response = await fetch(
-        "http://localhost:5000/api/content/brands",
+        "https://api.gevify.media/api/content/brands",
         {
           method: "PUT",
           headers: {
@@ -432,7 +432,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const response = await fetch(
-        "http://localhost:5000/api/content/production",
+        "https://api.gevify.media/api/content/production",
         {
           method: "PUT",
           headers: {
