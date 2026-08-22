@@ -145,7 +145,7 @@ const Navbar = ({}: NavbarProps) => {
       {/* Logo - left side */}
       <div className="absolute left-3 sm:left-4 md:left-8 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
         <button
-          onClick={() => handleNavClick("home")}
+          onClick={() => navigate(token ? "/admin/dashboard" : "/")}
           className="flex items-center cursor-pointer"
           title="BroEditz"
         >
