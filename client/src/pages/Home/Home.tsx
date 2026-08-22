@@ -169,6 +169,12 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (location.pathname === "/" || location.pathname === "/admin/dashboard") {
+      setActiveSection("hero");
+    }
+  }, [location.pathname]);
+
   // Validate admin token if in admin mode
   useEffect(() => {
     if (isAdminMode) {
