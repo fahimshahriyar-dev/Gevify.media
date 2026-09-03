@@ -2,7 +2,9 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { Pencil } from "lucide-react";
 import EditModalOverlay from "../../components/EditModalOverlay";
+import { useNavbarRightOffset } from "../../hooks/useNavbarRight";
 import Wheel from "../../components/animations/Wheel";
+import WheelMobile from "../../components/animations/Wheel_mobile";
 
 const DEFAULT_PRODUCTION = {
   sectionSubtitle: "OUR PRODUCTION ECOSYSTEM",
@@ -60,6 +62,7 @@ const Production: React.FC<ProductionProps> = ({
   onUpdateProduction,
   active = false,
 }) => {
+  const navbarRight = useNavbarRightOffset(isAdminMode);
   const prodData = {
     ...DEFAULT_PRODUCTION,
     ...(productionProp || {}),
@@ -191,7 +194,8 @@ const Production: React.FC<ProductionProps> = ({
         {isAdminMode && (
           <button
             onClick={openEdit}
-            className="absolute top-24 right-6 md:top-20 md:right-10 z-50 p-2.5 bg-[#06102F]/90 hover:bg-[#0086F0]/80 border border-[#0086F0]/50 hover:border-[#0086F0] text-[#5ACFFE] hover:text-white rounded-full transition-all duration-200 cursor-pointer shadow-lg hover:shadow-[#0086F0]/30 backdrop-blur-md"
+            className="absolute top-24 z-50 p-2.5 bg-[#06102F]/90 hover:bg-[#0086F0]/80 border border-[#0086F0]/50 hover:border-[#0086F0] text-[#5ACFFE] hover:text-white rounded-full transition-all duration-200 cursor-pointer shadow-lg hover:shadow-[#0086F0]/30 backdrop-blur-md"
+            style={{ right: navbarRight }}
             title="Edit Production Section"
           >
             <Pencil className="w-4 h-4" />
@@ -215,7 +219,7 @@ const Production: React.FC<ProductionProps> = ({
             on sm/md (stacked layout); reset to mb-0 at lg where the
             columns sit side by side instead of stacked.
           */}
-          <div className="w-full mb-[100px] md:mb-[160px] lg:mb-0 lg:w-[calc(30%-1.5rem)] flex flex-col items-start text-left gap-4 md:gap-5 px-4 lg:px-0 relative z-20">
+          <div className="w-full mb-[100px] md:mb-[160px] lg:mb-0 lg:w-[calc(30%-1.5rem)] flex flex-col items-start text-left gap-4 md:gap-5 -mx-4 sm:-mx-6 md:-mx-12 px-3 sm:px-4 lg:mx-0 lg:px-0 relative z-20">
             <span
               ref={sectionSubtitleRef}
               className="text-[10px] sm:text-xs md:text-sm lg:text-[11px] xl:text-xs 2xl:text-sm font-semibold tracking-[0.2em] text-[#0086F0] uppercase opacity-0 will-change-transform"
@@ -240,7 +244,14 @@ const Production: React.FC<ProductionProps> = ({
               {prodData.description}
             </p>
           </div>
-          <Wheel boxesData={prodData.boxes} />
+          <div className="w-full flex flex-col items-center lg:hidden">
+            <WheelMobile boxesData={prodData.boxes} />
+          </div>
+          <div className="hidden lg:flex lg:items-center lg:justify-center w-full lg:w-[calc(70%-1.5rem)]">
+            <div className="w-full origin-center">
+              <Wheel boxesData={prodData.boxes} />
+            </div>
+          </div>
         </div>
       </section>
 

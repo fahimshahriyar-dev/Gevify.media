@@ -4,6 +4,7 @@ import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import backgroundImage from '../../assets/images/background.webp';
 import { Pencil } from 'lucide-react';
+import { useNavbarRightOffset } from '../../hooks/useNavbarRight';
 
 const Ai = lazy(() => import('../../components/animations/Ai'));
 const AiMobile = lazy(() => import('../../components/animations/Ai_mobile'));
@@ -27,6 +28,7 @@ const Hero: React.FC<HeroProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const navbarRight = useNavbarRightOffset(isAdminMode);
   
   // Remount key to replay animations on navigation
   const [animKey, setAnimKey] = useState(0);
@@ -102,7 +104,8 @@ const Hero: React.FC<HeroProps> = ({
               setEditVideoUrl(videoUrl);
               setIsEditing(true);
             }}
-            className="absolute top-24 right-4 sm:top-24 sm:right-6 md:top-20 md:right-10 z-50 p-2 sm:p-2.5 bg-[#06102F]/90 hover:bg-[#0086F0]/80 border border-[#0086F0]/50 hover:border-[#0086F0] text-[#5ACFFE] hover:text-white rounded-full transition-all duration-200 cursor-pointer shadow-lg hover:shadow-[#0086F0]/30 backdrop-blur-md"
+            className="absolute top-24 p-2 sm:p-2.5 bg-[#06102F]/90 hover:bg-[#0086F0]/80 border border-[#0086F0]/50 hover:border-[#0086F0] text-[#5ACFFE] hover:text-white rounded-full transition-all duration-200 cursor-pointer shadow-lg hover:shadow-[#0086F0]/30 backdrop-blur-md"
+            style={{ right: navbarRight }}
             title="Edit Hero Section"
           >
             <Pencil className="w-4 h-4" />

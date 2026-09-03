@@ -61,6 +61,13 @@ const contentSchema = new mongoose.Schema({
     subtitle: { type: String },
     description: { type: String }
   },
+  solution: {
+    title: { type: String },
+    items: [{
+      title: { type: String },
+      subtitle: { type: String }
+    }]
+  },
   contact: {
     title: { type: String },
     subtitle: { type: String },
@@ -79,6 +86,20 @@ const contentSchema = new mongoose.Schema({
     facebook: { type: String },
     instagram: { type: String },
     youtube: { type: String }
+  },
+  termsAndConditions: {
+    title: { type: String },
+    sections: [{
+      title: { type: String },
+      content: { type: String }
+    }]
+  },
+  privacyPolicy: {
+    title: { type: String },
+    sections: [{
+      title: { type: String },
+      content: { type: String }
+    }]
   }
 }, { timestamps: true });
 

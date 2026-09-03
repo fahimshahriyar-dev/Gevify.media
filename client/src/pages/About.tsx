@@ -1,24 +1,36 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import EditModalOverlay from "../components/EditModalOverlay";
 import { Pencil } from "lucide-react";
 import { gsap } from "gsap";
+import { useNavbarRightOffset } from "../hooks/useNavbarRight";
 
 const DEFAULT_TITLE = "About Our Company";
 const DEFAULT_TEXT = `BroEditz is a premium video production studio powered by AI — built at the intersection of cinematic storytelling, cutting-edge technology, and strategic brand thinking.
 
 We combine AI-driven workflows with elite human creativity to produce content that rivals big-studio quality, delivered faster and at a fraction of the traditional cost.
 
-From e-commerce ads to social media content, AI influencer videos to full brand films, BroEditz is the production partner that thinks like a creative director and executes like a machine.`;
+From e-commerce ads to social media content, AI influencer videos to full brand films, BroEditz is the production partner that thinks like a creative director and executes like a machine.
+
+Our mission is simple: to make world-class video production accessible to every brand, regardless of size or budget. Whether you are a growing e-commerce store, an established national brand, or a busy agency, we become an extension of your creative team — scaling your output without ever diluting your message.
+
+We believe the future of video is hybrid. Cutting-edge AI handles the heavy lifting of iteration, speed, and scale, while skilled human editors, strategists, and directors shape every frame with taste, emotion, and intent. The result is content that feels crafted, not generated.
+
+From immersive brand films and high-converting ad creatives to always-on social content, we cover the full spectrum of modern video. Each project starts with strategy, is shaped by story, and is finished with cinematic post-production — colour, sound, and motion that elevate the final product.
+
+Speed matters. Traditional production pipelines can take weeks or months. Our AI-accelerated process compresses timelines dramatically, letting brands react to trends, launch campaigns, and test creative faster than ever before — without compromising the polish your audience expects.
+
+As your partner, we do not just deliver videos; we deliver outcomes. Clear communication, transparent workflows, and a relentless focus on performance ensure every project is aligned with your goals and built to move real-world results.`;
 
 interface AboutProps {
   isAdminMode?: boolean;
 }
 
 const About = ({ isAdminMode = false }: AboutProps) => {
-  const navigate = useNavigate();
+  const effectiveAdmin = isAdminMode || Boolean(localStorage.getItem("adminToken"));
+  const navbarRight = useNavbarRightOffset(effectiveAdmin);
   const [title, setTitle] = useState(DEFAULT_TITLE);
   const [text, setText] = useState(DEFAULT_TEXT);
   const [editOpen, setEditOpen] = useState(false);
@@ -57,11 +69,6 @@ const About = ({ isAdminMode = false }: AboutProps) => {
       "-=0.5",
     );
   }, [text, title]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    navigate("/");
-  };
 
   const openEdit = () => {
     setDraftTitle(title);
@@ -112,28 +119,12 @@ const About = ({ isAdminMode = false }: AboutProps) => {
       <Navbar />
 
       {/* Admin bar + Edit button */}
-      {isAdminMode && (
+      {effectiveAdmin && (
         <>
-          <div className="fixed top-6 right-6 md:right-10 z-[100] flex flex-col items-end gap-2">
-            <div className="hidden md:flex items-center gap-3 bg-[#06102F]/90 backdrop-blur-md border border-[#0086F0]/40 rounded-full px-5 py-3 shadow-xl shadow-black/40">
-              <button
-                onClick={() => navigate("/admin/profile")}
-                className="flex items-center gap-2 text-xs font-bold text-[#5ACFFE] uppercase tracking-wider hover:text-white transition-colors cursor-pointer"
-              >
-                <span className="w-2 h-2 rounded-full bg-[#0086F0] animate-ping" />
-                Admin Profile
-              </button>
-              <button
-                onClick={handleLogout}
-                className="text-xs font-medium text-white/80 hover:text-white bg-white/10 hover:bg-[#0086F0]/25 rounded-full px-3 py-1 transition-all cursor-pointer border border-transparent hover:border-[#0086F0]/30"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
           <button
             onClick={openEdit}
-            className="fixed top-24 right-6 md:top-20 md:right-10 z-50 p-2.5 bg-[#06102F]/90 hover:bg-[#0086F0]/80 border border-[#0086F0]/50 hover:border-[#0086F0] text-[#5ACFFE] hover:text-white rounded-full transition-all duration-200 cursor-pointer shadow-lg hover:shadow-[#0086F0]/30 backdrop-blur-md"
+            className="fixed top-24 z-50 p-2.5 bg-[#06102F]/90 hover:bg-[#0086F0]/80 border border-[#0086F0]/50 hover:border-[#0086F0] text-[#5ACFFE] hover:text-white rounded-full transition-all duration-200 cursor-pointer shadow-lg hover:shadow-[#0086F0]/30 backdrop-blur-md"
+            style={{ right: navbarRight }}
             title="Edit About Page"
           >
             <Pencil className="w-4 h-4" />
@@ -142,27 +133,29 @@ const About = ({ isAdminMode = false }: AboutProps) => {
       )}
 
       {/* Content */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-40 sm:pt-48 pb-24 flex flex-col gap-6 relative">
+      <main className="w-full px-3 sm:px-4 pt-32 sm:pt-36 pb-24 relative">
+        <div className="w-full max-w-[400px] mx-auto md:max-w-none lg:max-w-[calc(100%-185px)] flex flex-col gap-6">
         <h1
           ref={titleRef}
-          className="text-4xl sm:text-6xl font-black mb-4 bg-gradient-to-b from-[#333] to-[#c0c0c0] bg-clip-text text-transparent tracking-tight font-sans"
+          className="text-4xl sm:text-6xl font-black mb-4 bg-gradient-to-b from-[#333] to-[#c0c0c0] bg-clip-text text-transparent tracking-tight font-sans text-left"
         >
           {title}
         </h1>
 
-        <div ref={contentRef} className="flex flex-col gap-6">
+        <div ref={contentRef} className="flex flex-col gap-6 text-left">
           {text.split("\n\n").map((para, i) => (
             <p
               key={i}
-              className="text-zinc-300 text-base sm:text-lg lg:text-xl leading-relaxed font-sans"
+              className="text-zinc-300 text-base sm:text-lg lg:text-xl leading-relaxed font-sans text-left"
             >
               {para}
             </p>
           ))}
         </div>
+        </div>
       </main>
 
-      <Footer isAdminMode={isAdminMode} />
+      <Footer isAdminMode={effectiveAdmin} />
 
       {/* Edit Modal */}
       <EditModalOverlay isOpen={editOpen} onClose={() => setEditOpen(false)}>

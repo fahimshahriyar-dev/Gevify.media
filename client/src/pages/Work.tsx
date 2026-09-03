@@ -1,8 +1,15 @@
 import { useEffect, useState, useRef, useLayoutEffect } from "react";
-import { useNavigate } from "react-router-dom";
+
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import EditModalOverlay from "../components/EditModalOverlay";
+import CloudinaryVideoPlayer from "../components/CloudinaryVideoPlayer";
+import YouTubePlayer from "../components/YouTubePlayer";
+import { useNavbarRightOffset } from "../hooks/useNavbarRight";
+import {
+  isCloudinaryVideoUrl,
+  getCloudinaryVideoThumbnail,
+} from "../utils/cloudinary";
 import { Play, Pencil, Plus, Trash2 } from "lucide-react";
 import { gsap } from "gsap";
 
@@ -45,7 +52,7 @@ interface WorkProps {
 const PAGE_SIZE = 12;
 
 const Work = ({ isAdminMode = false }: WorkProps) => {
-  const navigate = useNavigate();
+  const navbarRight = useNavbarRightOffset(isAdminMode);
   const [workTitle, setWorkTitle] = useState("Our Work");
   const [workVideos, setWorkVideos] = useState<string[]>([]);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -55,7 +62,6 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
   const [editTitle, setEditTitle] = useState("");
   const [editVideos, setEditVideos] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
-  const [gridAnimating, setGridAnimating] = useState(true);
 
   const titleRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -87,7 +93,6 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
 
   // Prevent flash by setting initial hidden states layout-synced
   useLayoutEffect(() => {
-    setGridAnimating(true);
     if (titleRef.current) {
       gsap.set(titleRef.current.children, { y: 50, opacity: 0 });
     }
@@ -114,19 +119,19 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
       ease: "power4.out",
     });
 
-    // 2. Video cards rise smoothly from just below, starting right as the title appears
+    // 2. Video cards rise smoothly from just below, all together as one
+    // group (no stagger) so every box arrives bottom-to-top at once
+    // instead of cascading in one after another. Fast start via expo.out.
     if (gridRef.current && pageVideos.length > 0) {
       tl.to(
         gridRef.current.children,
         {
           y: 0,
           opacity: 1,
-          duration: 0.8,
-          stagger: 0.05,
-          ease: "power4.out",
-          onComplete: () => setGridAnimating(false),
+          duration: 0.5,
+          ease: "expo.out",
         },
-        "<0.2",
+        "<",
       );
     }
 
@@ -140,10 +145,6 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
     }
   }, [currentPage, workTitle, workVideos]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    navigate("/");
-  };
 
   const openEdit = () => {
     setEditTitle(workTitle);
@@ -190,26 +191,10 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
 
       {isAdminMode && (
         <>
-          <div className="fixed top-6 right-6 md:right-10 z-[100] flex flex-col items-end gap-2">
-            <div className="hidden md:flex items-center gap-3 bg-[#06102F]/90 backdrop-blur-md border border-[#0086F0]/40 rounded-full px-5 py-3 shadow-xl shadow-black/40">
-              <button
-                onClick={() => navigate("/admin/profile")}
-                className="flex items-center gap-2 text-xs font-bold text-[#5ACFFE] uppercase tracking-wider hover:text-white transition-colors cursor-pointer"
-              >
-                <span className="w-2 h-2 rounded-full bg-[#0086F0] animate-ping" />
-                Admin Profile
-              </button>
-              <button
-                onClick={handleLogout}
-                className="text-xs font-medium text-white/80 hover:text-white bg-white/10 hover:bg-[#0086F0]/25 rounded-full px-3 py-1 transition-all cursor-pointer border border-transparent hover:border-[#0086F0]/30"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
           <button
             onClick={openEdit}
-            className="fixed top-24 right-6 md:top-20 md:right-10 z-50 p-2.5 bg-[#06102F]/90 hover:bg-[#0086F0]/80 border border-[#0086F0]/50 hover:border-[#0086F0] text-[#5ACFFE] hover:text-white rounded-full transition-all duration-200 cursor-pointer shadow-lg hover:shadow-[#0086F0]/30 backdrop-blur-md"
+            className="fixed top-24 z-50 p-2.5 bg-[#06102F]/90 hover:bg-[#0086F0]/80 border border-[#0086F0]/50 hover:border-[#0086F0] text-[#5ACFFE] hover:text-white rounded-full transition-all duration-200 cursor-pointer shadow-lg hover:shadow-[#0086F0]/30 backdrop-blur-md"
+            style={{ right: navbarRight }}
             title="Edit Work Page"
           >
             <Pencil className="w-4 h-4" />
@@ -217,21 +202,18 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
         </>
       )}
 
-      <div className="min-h-screen flex flex-col pt-28 sm:pt-32 md:pt-40 pb-8 px-4 sm:px-6 md:px-12 lg:px-20 max-w-7xl mx-auto">
+      <div className="min-h-screen flex flex-col pt-28 sm:pt-32 md:pt-40 pb-8 px-3 sm:px-4 lg:px-20 max-w-7xl mx-auto">
         <div ref={titleRef} className="text-center mb-6 sm:mb-10 shrink-0">
           <h1 className="text-5xl sm:text-6xl font-black bg-gradient-to-b from-[#333] to-[#c0c0c0] bg-clip-text text-transparent tracking-tight font-sans px-2 opacity-0">
             {workTitle}
           </h1>
-          <p className="text-sm md:text-base text-zinc-500 font-medium tracking-widest uppercase mt-4 opacity-0">
-            Vertical &bull; Horizontal
-          </p>
         </div>
 
-        {/* Outer overflow-hidden wrapper clips cards as they rise from below */}
+        {/* Outer overflow-hidden wrapper clips cards as they rise from below.
+            Kept permanently hidden (no switch to auto-scroll) so cards never
+            visually overflow the section. */}
         <div className="flex-1 min-h-0 overflow-hidden">
-          <div
-            className={`w-full h-full ${gridAnimating ? "overflow-hidden" : "overflow-y-auto scrollbar-thin pr-1"}`}
-          >
+          <div className="w-full h-full overflow-hidden">
             <div
               ref={gridRef}
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 pb-4"
@@ -239,7 +221,9 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
               {workVideos.length > 0 &&
                 pageVideos.map((url, i) => {
                   const globalIdx = pageStart + i;
-                  const thumb = getYouTubeThumbnail(url);
+                  const thumb = isCloudinaryVideoUrl(url)
+                    ? getCloudinaryVideoThumbnail(url)
+                    : getYouTubeThumbnail(url);
                   return (
                     <button
                       key={globalIdx}
@@ -361,7 +345,7 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
                       updated[idx] = e.target.value;
                       setEditVideos(updated);
                     }}
-                    placeholder="https://www.youtube.com/watch?v=..."
+                    placeholder="YouTube or Cloudinary video URL"
                     className="flex-1 p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 text-white focus:outline-none focus:border-[#0086F0] text-sm font-medium"
                   />
                   <button
@@ -424,13 +408,31 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
               ✕
             </button>
             <div className="aspect-video w-full bg-black relative">
-              <iframe
-                src={getEmbedUrl(workVideos[activeIndex] || "")}
-                title={`Work Video ${activeIndex + 1}`}
-                className="w-full h-full border-0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              />
+              {(() => {
+                const url = workVideos[activeIndex] || "";
+                if (isCloudinaryVideoUrl(url)) {
+                  return (
+                    <CloudinaryVideoPlayer
+                      key={url}
+                      src={url}
+                      poster={getCloudinaryVideoThumbnail(url)}
+                    />
+                  );
+                }
+                const ytId = extractYouTubeId(url);
+                if (ytId) {
+                  return <YouTubePlayer key={url} videoId={ytId} />;
+                }
+                return (
+                  <iframe
+                    src={getEmbedUrl(url)}
+                    title={`Work Video ${activeIndex + 1}`}
+                    className="w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                );
+              })()}
             </div>
           </div>
         </div>

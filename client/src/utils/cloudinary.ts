@@ -14,3 +14,29 @@ export const optimizeCloudinaryUrl = (url: string, width = 200): string => {
   }
   return url;
 };
+
+/**
+ * Detects whether the given URL points to a video uploaded to Cloudinary
+ * (distinguished from a Cloudinary image by the `/video/upload/` segment).
+ */
+export const isCloudinaryVideoUrl = (url?: string | null): boolean => {
+  if (!url) return false;
+  return url.includes("res.cloudinary.com") && url.includes("/video/upload/");
+};
+
+/**
+ * Derives a poster/thumbnail image URL from a Cloudinary video URL by forcing
+ * a JPEG frame extraction (f_jpg) on the video's resource path. Unlike the
+ * image-resource trick, delivering through the /video/upload/ endpoint reliably
+ * returns a still frame regardless of the uploaded file's extension.
+ */
+export const getCloudinaryVideoThumbnail = (
+  url?: string | null,
+  width = 640,
+): string => {
+  if (!url || !isCloudinaryVideoUrl(url)) return "";
+  return url.replace(
+    "/video/upload/",
+    `/video/upload/f_jpg,w_${width},q_auto/`,
+  );
+};

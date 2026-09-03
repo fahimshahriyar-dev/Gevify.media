@@ -1,7 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { gsap } from "gsap";
-import { Play, ChevronLeft, ChevronRight } from "lucide-react";
+import CloudinaryVideoPlayer from "../CloudinaryVideoPlayer";
+import YouTubePlayer from "../YouTubePlayer";
+import {
+  isCloudinaryVideoUrl,
+  getCloudinaryVideoThumbnail,
+} from "../../utils/cloudinary";
+import {
+  Play,
+  ChevronLeft,
+  ChevronRight,
+  ArrowLeft,
+  ArrowRight,
+} from "lucide-react";
 
 const vertexShader = `
   varying vec2 vUv;
@@ -140,24 +152,14 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [activeCardIndex, setActiveCardIndex] = useState<number>(-1);
 
-  // Responsive state to detect lg devices
-  const [isLg, setIsLg] = useState<boolean>(() =>
-    typeof window !== "undefined"
-      ? window.matchMedia("(min-width: 1024px)").matches
-      : true,
-  );
-
+  // Notify parent page so it can hide overlapping UI (e.g. nav arrows) while the popup is open
   useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
-    const handler = (e: MediaQueryListEvent) => setIsLg(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-
-  const isLgRef = useRef(isLg);
-  useEffect(() => {
-    isLgRef.current = isLg;
-  }, [isLg]);
+    window.dispatchEvent(
+      new CustomEvent("video-popup-change", {
+        detail: { open: isPopupOpen },
+      }),
+    );
+  }, [isPopupOpen]);
 
   const getEmbedUrl = (url: string) => {
     if (!url) return "";
@@ -176,7 +178,12 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
 
   const imageUrls = Array.from({ length: 12 }, (_, i) => {
     const videoUrl = workVideos[i];
-    const thumb = videoUrl ? getYouTubeThumbnail(videoUrl) : null;
+    let thumb = null;
+    if (videoUrl) {
+      thumb = isCloudinaryVideoUrl(videoUrl)
+        ? getCloudinaryVideoThumbnail(videoUrl)
+        : getYouTubeThumbnail(videoUrl);
+    }
     return thumb || fallbackImages[i % fallbackImages.length];
   });
 
@@ -271,7 +278,6 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
 
     // --- Wheel: slow and smooth ---
     const handleWheel = (e: WheelEvent) => {
-      if (!isLgRef.current) return;
       e.stopPropagation();
       applyDelta(-e.deltaY); // inverted: scroll down = negative delta
     };
@@ -294,11 +300,9 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
     }
 
     const handleTouchStart = (e: TouchEvent) => {
-      if (!isLgRef.current) return;
       e.stopPropagation();
     };
     const handleTouchEnd = (e: TouchEvent) => {
-      if (!isLgRef.current) return;
       e.stopPropagation();
     };
 
@@ -324,7 +328,6 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
       const dy = e.clientY - lastY;
       lastY = e.clientY;
       dragDistance += Math.abs(dy);
-      if (!isLgRef.current) return;
       applyDelta(-dy * 1.2); // drag down = negative delta (top-to-bottom)
     };
 
@@ -637,7 +640,7 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
 
   return (
     <div className="absolute inset-0 w-full h-full bg-transparent flex flex-col items-center justify-center z-10">
-      <div ref={mountRef} className={`w-full h-full ${isLg ? "touch-none" : "touch-pan-y"}`} />
+      <div ref={mountRef} className="w-full h-full touch-none" />
 
       {/* Overlay div: always in DOM, position+size set each frame by syncOverlay(), opacity driven by CSS transition */}
       <div
@@ -676,22 +679,22 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
             }
           `}</style>
 
-          {/* Flex row: [Left Arrow] [Modal] [Right Arrow] — arrows sit right beside the popup. On sm: modal full-width, arrows stacked below the video. */}
+          {/* Flex row: [Left Arrow] [Modal] [Right Arrow] on md+. On sm: modal full-width with Next/Previous buttons below. */}
           <div
-            className="flex items-center gap-3 sm:gap-4 w-full max-w-5xl sm:grid sm:grid-cols-2 sm:justify-items-center md:flex md:flex-row md:items-center"
+            className="flex flex-col items-center gap-4 w-full max-w-5xl md:flex-row md:items-center"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Left Arrow */}
+            {/* Left Arrow — side (md+ only) */}
             <button
               onClick={() => setActiveCardIndex((prev) => (prev - 1 + 12) % 12)}
-              className="shrink-0 w-11 h-11 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/15 text-white/70 hover:text-white hover:scale-110 active:scale-95 transition-all border border-white/10 cursor-pointer shadow-2xl backdrop-blur-sm sm:col-start-1 sm:row-start-2 sm:justify-self-end md:order-none"
+              className="hidden md:flex shrink-0 w-12 h-12 items-center justify-center rounded-full bg-white/5 hover:bg-white/15 text-white/70 hover:text-white hover:scale-110 active:scale-95 transition-all border border-white/10 cursor-pointer shadow-2xl backdrop-blur-sm"
               title="Previous Video"
             >
               <ChevronLeft className="w-6 h-6" />
             </button>
 
             {/* Modal */}
-            <div className="modal-animate relative flex-1 min-w-0 bg-neutral-900/90 border border-white/10 rounded-2xl overflow-hidden shadow-2xl sm:col-start-1 sm:col-span-2 sm:row-start-1 sm:w-full md:order-none">
+            <div className="modal-animate relative w-full flex-1 min-w-0 bg-neutral-900/90 border border-white/10 rounded-lg sm:rounded-2xl overflow-hidden shadow-2xl">
               {/* Close Button */}
               <button
                 onClick={() => setIsPopupOpen(false)}
@@ -700,12 +703,30 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
                 ✕
               </button>
 
-              {/* Embedded YouTube Video Container */}
+              {/* Embedded Video Container */}
               <div className="aspect-video w-full bg-black relative">
                 {(() => {
                   const videoUrl =
                     workVideos[activeCardIndex] ||
                     "https://www.youtube.com/watch?v=bSl7z00Hnug";
+                  if (isCloudinaryVideoUrl(videoUrl)) {
+                    return (
+                      <CloudinaryVideoPlayer
+                        key={activeCardIndex + ":" + videoUrl}
+                        src={videoUrl}
+                        poster={getCloudinaryVideoThumbnail(videoUrl)}
+                      />
+                    );
+                  }
+                  const ytId = extractYouTubeId(videoUrl);
+                  if (ytId) {
+                    return (
+                      <YouTubePlayer
+                        key={activeCardIndex + ":" + videoUrl}
+                        videoId={ytId}
+                      />
+                    );
+                  }
                   return (
                     <iframe
                       key={activeCardIndex}
@@ -720,14 +741,32 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
               </div>
             </div>
 
-            {/* Right Arrow */}
+            {/* Right Arrow — side (md+ only) */}
             <button
               onClick={() => setActiveCardIndex((prev) => (prev + 1) % 12)}
-              className="shrink-0 w-11 h-11 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/15 text-white/70 hover:text-white hover:scale-110 active:scale-95 transition-all border border-white/10 cursor-pointer shadow-2xl backdrop-blur-sm sm:col-start-2 sm:row-start-2 sm:justify-self-start md:order-none"
+              className="hidden md:flex shrink-0 w-12 h-12 items-center justify-center rounded-full bg-white/5 hover:bg-white/15 text-white/70 hover:text-white hover:scale-110 active:scale-95 transition-all border border-white/10 cursor-pointer shadow-2xl backdrop-blur-sm"
               title="Next Video"
             >
               <ChevronRight className="w-6 h-6" />
             </button>
+
+            {/* Next / Previous buttons — bottom of video (sm only) */}
+            <div className="flex items-center justify-between w-full gap-4 md:hidden">
+              <button
+                onClick={() => setActiveCardIndex((prev) => (prev - 1 + 12) % 12)}
+                className="flex items-center justify-center gap-2 flex-1 py-3 rounded-lg bg-white/5 hover:bg-white/15 text-white/80 hover:text-white transition-all border border-white/10 text-sm font-semibold cursor-pointer"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Previous
+              </button>
+              <button
+                onClick={() => setActiveCardIndex((prev) => (prev + 1) % 12)}
+                className="flex items-center justify-center gap-2 flex-1 py-3 rounded-lg bg-white/5 hover:bg-white/15 text-white/80 hover:text-white transition-all border border-white/10 text-sm font-semibold cursor-pointer"
+              >
+                Next
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       )}

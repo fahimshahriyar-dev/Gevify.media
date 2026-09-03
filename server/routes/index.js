@@ -27,7 +27,10 @@ import {
   updateAbout,
   updateContact,
   updateFooter,
-  updateLogo
+  updateLogo,
+  updateSolutionPage,
+  updateTermsAndConditions,
+  updatePrivacyPolicy
 } from "../controllers/contentController.js";
 import { verifyAdminToken } from "../middleware/auth.js";
 
@@ -67,7 +70,10 @@ router.put("/content/brands", verifyAdminToken, updateBrands);
 router.put("/content/production", verifyAdminToken, updateProduction);
 router.put("/content/work-page", verifyAdminToken, updateWorkPage);
 router.put("/content/about", verifyAdminToken, updateAbout);
+router.put("/content/solution-page", verifyAdminToken, updateSolutionPage);
 router.put("/content/contact", verifyAdminToken, updateContact);
 router.put("/content/footer", verifyAdminToken, updateFooter);
+router.put("/content/terms-and-conditions", verifyAdminToken, updateTermsAndConditions);
+router.put("/content/privacy-policy", verifyAdminToken, updatePrivacyPolicy);
 
 export default router;

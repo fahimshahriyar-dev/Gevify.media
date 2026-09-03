@@ -55,6 +55,19 @@ const HomeWork = ({
         aria-hidden="true"
       />
 
+      <style>{`
+        @keyframes nudge-left {
+          0%, 100% { transform: translateX(0); }
+          50% { transform: translateX(-5px); }
+        }
+        @keyframes nudge-right {
+          0%, 100% { transform: translateX(0); }
+          50% { transform: translateX(5px); }
+        }
+        .animate-nudge-left { animation: nudge-left 1.4s ease-in-out infinite; }
+        .animate-nudge-right { animation: nudge-right 1.4s ease-in-out infinite; }
+      `}</style>
+
       <Suspense fallback={null}>
         <Slider workVideos={workVideos} />
       </Suspense>
@@ -68,26 +81,20 @@ const HomeWork = ({
         }
         className="absolute bottom-8 left-12 hidden lg:flex items-center gap-2 text-slate-600 hover:text-slate-950 font-semibold transition-colors z-20 cursor-pointer group"
       >
-        <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
-        <span className="hidden lg:inline text-xs font-semibold tracking-widest uppercase">
+        <ArrowLeft className="w-5 h-5 animate-nudge-left" />
+        <span className="hidden lg:inline text-sm font-semibold tracking-widest uppercase">
           Previous Page
         </span>
       </button>
-
-      <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-4 items-center text-slate-700 text-sm tracking-widest pointer-events-none z-20">
-        <b className="font-semibold uppercase text-slate-900">Vertical</b>
-        <span className="w-1.5 h-1.5 rounded-full bg-[#0086F0] opacity-80"></span>
-        <span className="opacity-60 uppercase text-slate-600">Horizontal</span>
-      </div>
 
       <button
         onClick={onGoToSolution}
         className="absolute bottom-8 right-12 hidden lg:flex items-center gap-2 text-slate-600 hover:text-slate-950 font-semibold transition-colors z-20 cursor-pointer group"
       >
-        <span className="hidden lg:inline text-xs font-semibold tracking-widest uppercase">
+        <span className="hidden lg:inline text-sm font-semibold tracking-widest uppercase">
           Next Page
         </span>
-        <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+        <ArrowRight className="w-5 h-5 animate-nudge-right" />
       </button>
 
       {/* ── Edit Videos Modal ── */}
@@ -132,7 +139,7 @@ const HomeWork = ({
                         updated[i] = e.target.value;
                         setDraft(updated);
                       }}
-                      placeholder={`Card ${i + 1} — YouTube URL`}
+                      placeholder={`Card ${i + 1} — YouTube or Cloudinary URL`}
                       className="flex-1 bg-zinc-900 border border-zinc-800 focus:border-[#0086F0] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none transition-all"
                     />
                   </div>

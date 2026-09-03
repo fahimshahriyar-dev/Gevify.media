@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Pencil } from "lucide-react";
+import { Pencil, ChevronUp, ChevronDown } from "lucide-react";
 import { lazy, Suspense } from "react";
 import Navbar from "../../components/Navbar";
 import Hero from "./Hero";
 import Footer from "../../components/Footer";
+import { useNavbarRightOffset } from "../../hooks/useNavbarRight";
 
 const HomeWork = lazy(() => import("./HomeWork"));
 const OurSolution = lazy(() => import("./OurSolution"));
@@ -134,22 +135,15 @@ const DEFAULT_CONTENT: HomepageContent = {
 };
 
 const Home = ({ isAdminMode = false }: HomeProps) => {
+  const navbarRight = useNavbarRightOffset(isAdminMode);
   const [activeSection, setActiveSection] = useState<
     "hero" | "about" | "solution" | "production" | "reviews"
   >("hero");
   const [isTransitioning, setIsTransitioning] = useState(false);
-  // Initialize with DEFAULT_CONTENT so the page renders immediately (stale-while-revalidate).
-  // The API fetch runs in the background and updates state when it resolves.
-  const [content, setContent] = useState<HomepageContent>(DEFAULT_CONTENT);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  // true when viewport is ≥ 1024 px (Tailwind "lg" breakpoint)
-  const [isLg, setIsLg] = useState<boolean>(() =>
-    typeof window !== "undefined"
-      ? window.matchMedia("(min-width: 1024px)").matches
-      : true,
-  );
+  const [loading, setLoading] = useState(false);
+  const [content, setContent] = useState<HomepageContent>(DEFAULT_CONTENT);
+  const [isVideoPopupOpen, setIsVideoPopupOpen] = useState(false);
 
   const isAnimatingRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -158,22 +152,28 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
   const productionRef = useRef<HTMLDivElement>(null);
   const reviewsRef = useRef<HTMLDivElement>(null);
 
-  // Mobile layout: refs + inView states for scroll-triggered entry animations
-  const mobileOurSolutionRef = useRef<HTMLDivElement>(null);
-  const mobileProductionRef = useRef<HTMLDivElement>(null);
-  const mobileReviewsRef = useRef<HTMLDivElement>(null);
-  const [mobileOurSolutionActive, setMobileOurSolutionActive] = useState(false);
-  const [mobileProductionActive, setMobileProductionActive] = useState(false);
-  const [mobileReviewsActive, setMobileReviewsActive] = useState(false);
-
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (location.pathname === "/" || location.pathname === "/admin/dashboard") {
+    if (
+      location.pathname === "/" ||
+      location.pathname === "/hero" ||
+      location.pathname === "/admin/dashboard"
+    ) {
       setActiveSection("hero");
     }
   }, [location.pathname]);
+
+  // Hide section nav arrows while the video popup is open
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const open = (e as CustomEvent).detail?.open;
+      setIsVideoPopupOpen(Boolean(open));
+    };
+    window.addEventListener("video-popup-change", handler);
+    return () => window.removeEventListener("video-popup-change", handler);
+  }, []);
 
   // Validate admin token if in admin mode
   useEffect(() => {
@@ -207,45 +207,6 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
   useEffect(() => {
     fetchContent();
   }, []);
-
-  // Keep isLg in sync with live viewport resizes
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
-    const handler = (e: MediaQueryListEvent) => setIsLg(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-
-  // On sm/md: fire each section's entry animation when it scrolls into view
-  useEffect(() => {
-    if (isLg || loading) return;
-
-    const observers: IntersectionObserver[] = [];
-
-    const watch = (
-      el: HTMLDivElement | null,
-      activate: (v: boolean) => void,
-    ) => {
-      if (!el) return;
-      const obs = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            activate(true);
-            obs.unobserve(el); // trigger once, keep it active
-          }
-        },
-        { threshold: 0.15 },
-      );
-      obs.observe(el);
-      observers.push(obs);
-    };
-
-    watch(mobileOurSolutionRef.current, setMobileOurSolutionActive);
-    watch(mobileProductionRef.current, setMobileProductionActive);
-    watch(mobileReviewsRef.current, setMobileReviewsActive);
-
-    return () => observers.forEach((o) => o.disconnect());
-  }, [isLg, loading]);
 
   const handleUpdateHero = async (
     title: string,
@@ -463,9 +424,30 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    navigate("/");
+  const goToNextSection = () => {
+    if (isAnimatingRef.current) return;
+    if (activeSection === "hero") {
+      transitionToAbout();
+    } else if (activeSection === "about") {
+      transitionToSolution();
+    } else if (activeSection === "solution") {
+      transitionToProduction();
+    } else if (activeSection === "production") {
+      transitionToReviews();
+    }
+  };
+
+  const goToPrevSection = () => {
+    if (isAnimatingRef.current) return;
+    if (activeSection === "about") {
+      transitionToHero();
+    } else if (activeSection === "solution") {
+      transitionToWork();
+    } else if (activeSection === "production") {
+      transitionToSolution();
+    } else if (activeSection === "reviews") {
+      transitionToProduction();
+    }
   };
 
   const transitionToAbout = () => {
@@ -594,18 +576,18 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
   };
 
   useEffect(() => {
-    if (!isLg) return;
     const targetSection = (location.state as { section?: string })?.section;
     if (targetSection === "homework") {
       transitionToAbout();
       window.history.replaceState({}, document.title);
     }
-  }, [location.state, loading, isLg]);
+    if (targetSection === "hero") {
+      transitionToHero();
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state, loading]);
 
   useEffect(() => {
-    // Scroll animation only on lg+ devices
-    if (!isLg) return;
-
     let touchStartY = 0;
 
     const handleWheel = (e: WheelEvent) => {
@@ -706,11 +688,11 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
         t.removeEventListener("touchstart", handleTouchStart);
         t.removeEventListener("touchend", handleTouchEnd);
       });
-    };
-  }, [activeSection, loading, isLg]);
+};
+
+  }, [activeSection, loading]);
 
   useEffect(() => {
-    if (!isLg) return;
     const handler = (e: Event) => {
       const detail = (e as CustomEvent).detail;
       if (detail === "homework") transitionToAbout();
@@ -718,8 +700,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
     };
     window.addEventListener("goto-section", handler);
     return () => window.removeEventListener("goto-section", handler);
-  }, [activeSection, loading, isLg]);
-
+  }, [activeSection, loading]);
   const heroTitle = content?.hero?.title || "";
   const heroSubtitle = content?.hero?.subtitle || "";
   const heroVideoUrl =
@@ -728,129 +709,11 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
   const revs = content?.reviews || [];
   const fqs = content?.faqs || [];
 
-  // ─── Mobile / tablet layout (sm + md, < 1024 px) ────────────────────────
-  if (!isLg) {
-    return (
-      <div className="w-full bg-[#0a0a0a] overflow-x-hidden">
-        {/* Loading Overlay */}
-        {loading && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white">
-            <div className="text-center">
-              <div className="relative h-12 w-12 mx-auto mb-5">
-                <div className="absolute inset-0 rounded-full border-2 border-[#0086F0]/20"></div>
-                <div className="h-12 w-12 animate-spin rounded-full border-2 border-transparent border-t-[#0086F0]"></div>
-              </div>
-              <p className="text-sm text-[#5ACFFE]/80 tracking-widest uppercase font-medium">
-                Loading...
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Error Overlay */}
-        {!loading && (error || !content) && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white">
-            <div className="text-center">
-              <div className="w-12 h-12 rounded-full bg-[#0086F0]/10 border border-[#0086F0]/30 flex items-center justify-center mx-auto mb-4">
-                <span className="text-[#5ACFFE] text-xl font-bold">!</span>
-              </div>
-              <p className="text-[#5ACFFE] mb-5 text-sm">
-                {error || "Error loading page contents"}
-              </p>
-              <button
-                onClick={fetchContent}
-                className="px-5 py-2 bg-[#0086F0] hover:bg-[#0073ce] transition-colors rounded text-sm font-semibold cursor-pointer"
-              >
-                Retry
-              </button>
-            </div>
-          </div>
-        )}
-
-        {isAdminMode && (
-          <div className="fixed top-6 right-6 z-[100] flex flex-col items-end gap-2">
-            <div className="flex items-center gap-3 bg-[#06102F]/90 backdrop-blur-md border border-[#0086F0]/40 rounded-full px-4 py-2.5 shadow-xl shadow-black/40">
-              <button
-                onClick={() => navigate("/admin/profile")}
-                className="flex items-center gap-2 text-xs font-bold text-[#5ACFFE] uppercase tracking-wider hover:text-white transition-colors cursor-pointer"
-              >
-                <span className="w-2 h-2 rounded-full bg-[#0086F0] animate-ping" />
-                Admin
-              </button>
-              <button
-                onClick={handleLogout}
-                className="text-xs font-medium text-white/80 hover:text-white bg-white/10 hover:bg-[#0086F0]/25 rounded-full px-3 py-1 transition-all cursor-pointer border border-transparent hover:border-[#0086F0]/30"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        )}
-
-        <Navbar whiteLogo />
-
-        {/* Sections flow naturally — no animation */}
-        <Hero
-          standalone={false}
-          title={heroTitle}
-          subtitle={heroSubtitle}
-          videoUrl={heroVideoUrl}
-          isAdminMode={isAdminMode}
-          onUpdateHero={handleUpdateHero}
-        />
-        <Suspense fallback={null}>
-          <HomeWork
-            workVideos={content?.workVideos || []}
-            isAdminMode={isAdminMode}
-            onUpdateWorkVideos={handleUpdateWorkVideos}
-          />
-        </Suspense>
-        <div ref={mobileOurSolutionRef}>
-          <Suspense fallback={null}>
-            <OurSolution
-              active={mobileOurSolutionActive}
-              solutionTitle={solTitle}
-              solutionCards={content?.solutionCards}
-              brands={content?.brands}
-              isAdminMode={isAdminMode}
-              onUpdateSolutionTitle={handleUpdateSolutionTitle}
-              onUpdateSolution={handleUpdateSolution}
-              onUpdateBrands={handleUpdateBrands}
-            />
-          </Suspense>
-        </div>
-        <div ref={mobileProductionRef}>
-          <Suspense fallback={null}>
-            <Production
-              production={content?.production}
-              isAdminMode={isAdminMode}
-              onUpdateProduction={handleUpdateProduction}
-              active={mobileProductionActive}
-            />
-          </Suspense>
-        </div>
-        <div ref={mobileReviewsRef}>
-          <Suspense fallback={null}>
-            <ReviewsSection
-              reviews={revs}
-              faqs={fqs}
-              isAdminMode={isAdminMode}
-              onUpdateReviews={handleUpdateReviews}
-              onUpdateFaqs={handleUpdateFaqs}
-              active={mobileReviewsActive}
-            />
-          </Suspense>
-        </div>
-        <Footer isAdminMode={isAdminMode} />
-      </div>
-    );
-  }
-
-  // ─── Desktop layout (lg+): full-page scroll animation ────────────────────
+  // ─── Full-page slide animation (all device sizes) ────────────────────────
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-screen bg-[#0a0a0a] overflow-hidden"
+      className="relative w-full h-dvh bg-[#0a0a0a] overflow-hidden"
     >
       {/* Loading Overlay */}
       {loading && (
@@ -888,24 +751,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
       )}
 
       {isAdminMode && (
-        <div className="fixed top-6 right-6 md:right-10 z-[100] flex flex-col items-end gap-2">
-          {/* Admin Profile button + Logout */}
-          <div className="hidden md:flex items-center gap-3 bg-[#06102F]/90 backdrop-blur-md border border-[#0086F0]/40 rounded-full px-5 py-3 shadow-xl shadow-black/40">
-            <button
-              onClick={() => navigate("/admin/profile")}
-              className="flex items-center gap-2 text-xs font-bold text-[#5ACFFE] uppercase tracking-wider hover:text-white transition-colors cursor-pointer"
-            >
-              <span className="w-2 h-2 rounded-full bg-[#0086F0] animate-ping" />
-              Admin Profile
-            </button>
-            <button
-              onClick={handleLogout}
-              className="text-xs font-medium text-white/80 hover:text-white bg-white/10 hover:bg-[#0086F0]/25 rounded-full px-3 py-1 transition-all cursor-pointer border border-transparent hover:border-[#0086F0]/30"
-            >
-              Logout
-            </button>
-          </div>
-
+        <div className="fixed top-24 z-[100] flex flex-col items-end gap-2" style={{ right: navbarRight }}>
           {/* Edit Work Videos — only on homework section when active and not scrolling/transitioning */}
           {activeSection === "about" && !isTransitioning && (
             <button
@@ -921,6 +767,32 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
           )}
         </div>
       )}
+
+      {/* Section navigation arrows — sm/md devices only */}
+      <div
+        className={`fixed right-0 bottom-0 z-[90] flex flex-col lg:hidden ${
+          isVideoPopupOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+        } transition-opacity duration-200`}
+      >
+        {activeSection !== "hero" && (
+          <button
+            onClick={goToPrevSection}
+            aria-label="Previous section"
+            className="w-14 h-12 flex items-center justify-center bg-[#06102F]/90 backdrop-blur-md border border-[#0086F0]/40 border-b-0 text-[#5ACFFE] hover:text-white hover:bg-[#0086F0]/80 transition-all duration-200 cursor-pointer"
+          >
+            <ChevronUp className="w-5 h-5" />
+          </button>
+        )}
+        {activeSection !== "reviews" && (
+          <button
+            onClick={goToNextSection}
+            aria-label="Next section"
+            className="w-14 h-12 flex items-center justify-center bg-[#06102F]/90 backdrop-blur-md border border-[#0086F0]/40 text-[#5ACFFE] hover:text-white hover:bg-[#0086F0]/80 transition-all duration-200 cursor-pointer"
+          >
+            <ChevronDown className="w-5 h-5" />
+          </button>
+        )}
+      </div>
 
       <Navbar whiteLogo={activeSection === "hero"} />
 

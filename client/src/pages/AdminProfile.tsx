@@ -380,7 +380,7 @@ const AdminProfile = () => {
     <div className="w-full h-screen bg-[#06102F] text-white font-sans flex flex-col overflow-hidden">
       <Navbar />
 
-      <div className="flex-1 min-h-0 max-w-[1500px] w-full mx-auto px-3 sm:px-6 lg:px-8 pt-24 xl:pt-28 pb-6 flex flex-col lg:flex-row gap-5 lg:gap-8 overflow-hidden">
+      <div className="flex-1 min-h-0 w-full mx-auto lg:max-w-[calc(100%-217px)] px-3 sm:px-6 lg:px-0 pt-24 xl:pt-28 pb-6 flex flex-col lg:flex-row gap-5 lg:gap-8 overflow-hidden">
         {/* ═══════════════════════════════════════════════════════
             SIDEBAR NAVIGATION
             ═══════════════════════════════════════════════════════ */}

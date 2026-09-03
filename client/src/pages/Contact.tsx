@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
-import { useNavigate } from "react-router-dom";
+
 import Navbar from "../components/Navbar";
 import EditModalOverlay from "../components/EditModalOverlay";
 import PhoneNumberInput, {
   isValidWhatsAppNumber,
 } from "../components/PhoneNumberInput";
-import { Mail, Pencil } from "lucide-react";
+import { Mail, Pencil, ChevronUp } from "lucide-react";
 import { gsap } from "gsap";
+import { useNavbarRightOffset } from "../hooks/useNavbarRight";
 import contactBg from "../assets/images/contact_bg.webp";
 import { optimizeCloudinaryUrl } from "../utils/cloudinary";
 
@@ -38,7 +39,7 @@ const DEFAULT_CONTACT: ContactData = {
 };
 
 const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
-  const navigate = useNavigate();
+  const navbarRight = useNavbarRightOffset(isAdminMode);
   const [contact, setContact] = useState<ContactData>(DEFAULT_CONTACT);
   const [logo, setLogo] = useState(DEFAULT_LOGO);
   const [editOpen, setEditOpen] = useState(false);
@@ -145,10 +146,6 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
     stack.style.transform = `scale(${scale})`;
   }, [contact.title]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    navigate("/");
-  };
 
   const openEdit = () => {
     setDraft(contact);
@@ -333,31 +330,26 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
       {/* Admin bar + Edit button */}
       {isAdminMode && (
         <>
-          <div className="fixed top-6 right-6 md:right-10 z-[100] flex flex-col items-end gap-2">
-            <div className="hidden md:flex items-center gap-3 bg-[#06102F]/90 backdrop-blur-md border border-[#0086F0]/40 rounded-full px-5 py-3 shadow-xl shadow-black/40">
-              <button
-                onClick={() => navigate("/admin/profile")}
-                className="flex items-center gap-2 text-xs font-bold text-[#5ACFFE] uppercase tracking-wider hover:text-white transition-colors cursor-pointer"
-              >
-                <span className="w-2 h-2 rounded-full bg-[#0086F0] animate-ping" />
-                Admin Profile
-              </button>
-              <button
-                onClick={handleLogout}
-                className="text-xs font-medium text-white/80 hover:text-white bg-white/10 hover:bg-[#0086F0]/25 rounded-full px-3 py-1 transition-all cursor-pointer border border-transparent hover:border-[#0086F0]/30"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
           <button
             onClick={openEdit}
-            className="fixed top-24 right-6 md:top-20 md:right-10 z-50 p-2.5 bg-[#06102F]/90 hover:bg-[#0086F0]/80 border border-[#0086F0]/50 hover:border-[#0086F0] text-[#5ACFFE] hover:text-white rounded-full transition-all duration-200 cursor-pointer shadow-lg hover:shadow-[#0086F0]/30 backdrop-blur-md"
+            className="fixed top-24 z-50 p-2.5 bg-[#06102F]/90 hover:bg-[#0086F0]/80 border border-[#0086F0]/50 hover:border-[#0086F0] text-[#5ACFFE] hover:text-white rounded-full transition-all duration-200 cursor-pointer shadow-lg hover:shadow-[#0086F0]/30 backdrop-blur-md"
+            style={{ right: navbarRight }}
             title="Edit Contact Page"
           >
             <Pencil className="w-4 h-4" />
           </button>
         </>
+      )}
+
+      {/* Up arrow — shown on Section 2 (form) to go back to Section 1 */}
+      {showForm && (
+        <button
+          onClick={() => setShowForm(false)}
+          aria-label="Previous section"
+          className="fixed bottom-0 right-0 z-[90] w-14 h-12 flex items-center justify-center bg-[#06102F]/90 backdrop-blur-md border border-[#0086F0]/40 text-[#5ACFFE] hover:text-white hover:bg-[#0086F0]/80 transition-all duration-200 cursor-pointer"
+        >
+          <ChevronUp className="w-5 h-5" />
+        </button>
       )}
 
       <div
@@ -489,11 +481,11 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
             ref={copyrightRef}
             className="text-[10px] sm:text-xs md:text-sm text-zinc-500 font-medium text-left pointer-events-auto"
           >
-            © All Rights Reserved |{" "}
+            © 2026{" "}
             <span className="text-zinc-300 font-semibold">
-              {contact.company}
+              {contact.company}.
             </span>{" "}
-            2026 | Designed & Developed by Fahim Shahriyar Mugdho
+            All Rights Reserved.
           </p>
         </div>
 

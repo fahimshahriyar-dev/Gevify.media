@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronDown, Pencil, Plus, Trash2 } from "lucide-react";
 import EditModalOverlay from "../../components/EditModalOverlay";
 import { gsap } from "gsap";
+import { useNavbarRightOffset } from "../../hooks/useNavbarRight";
 import type { FaqItem } from "./Home";
 
 interface FaqProps {
@@ -25,6 +26,7 @@ const Faq = ({
   modalScrollTop: _modalScrollTop = 0,
   active = false,
 }: FaqProps) => {
+  const navbarRight = useNavbarRightOffset(isAdminMode);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   // Edit State
@@ -111,14 +113,15 @@ const Faq = ({
       {isAdminMode && (
         <button
           onClick={startEditing}
-          className="absolute top-24 right-6 md:top-20 md:right-10 z-50 p-2.5 bg-[#06102F]/90 hover:bg-[#0086F0]/80 border border-[#0086F0]/50 hover:border-[#0086F0] text-[#5ACFFE] hover:text-white rounded-full transition-all duration-200 cursor-pointer shadow-lg hover:shadow-[#0086F0]/30 backdrop-blur-md"
+          className="absolute top-24 z-50 p-2.5 bg-[#06102F]/90 hover:bg-[#0086F0]/80 border border-[#0086F0]/50 hover:border-[#0086F0] text-[#5ACFFE] hover:text-white rounded-full transition-all duration-200 cursor-pointer shadow-lg hover:shadow-[#0086F0]/30 backdrop-blur-md"
+          style={{ right: navbarRight }}
           title="Edit FAQ"
         >
           <Pencil className="w-4 h-4" />
         </button>
       )}
 
-      <div className="w-full px-4 sm:px-8 md:px-16 lg:px-24">
+      <div className="w-full px-3 sm:px-4 lg:px-24">
         <div
           ref={titleRef}
           className="flex justify-center items-center mb-10 sm:mb-16 relative"

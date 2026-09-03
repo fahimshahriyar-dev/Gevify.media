@@ -13,14 +13,14 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-const CENTER = { x: 1006, y: 227 };
+const CENTER = { x: 633, y: 227 };
 const OUTER_RADIUS = 196; // must match the outer <circle r="196">
 const BOX_COUNT = 8;
 const BOX_WIDTH = 58;
 const BOX_HEIGHT = 59;
 const STEP = 360 / BOX_COUNT; // 45deg between boxes
 
-const RING_CENTER = { x: 1005.5, y: 226.5 };
+const RING_CENTER = { x: 632.5, y: 226.5 };
 const RING_RADIUS = 54;
 const CENTER_ICON_SIZE = 52;
 
@@ -48,11 +48,23 @@ const BOX_ICONS: LucideIcon[] = [
   Send,
 ];
 
+// Shorter mobile connector paths (animated flow paths)
+const PATH1_D =
+  "M2.00895 443.386H99.0275C132.521 443.386 159.673 399.911 159.673 346.283V326.982C159.673 274.02 186.487 231.085 219.564 231.085H389.61";
+const PATH2_D =
+  "M878.621 224.665H914.839C934.404 224.665 950.264 249 950.264 279.169C950.264 309.271 966.583 333.673 986.715 333.673H1037.26";
+
+// Static (white) connector shapes including arrowheads
+const STATIC_PATH1_D =
+  "M0 442.783C0 444.56 0.899435 446 2.00895 446C3.11846 446 4.01789 444.56 4.01789 442.783C4.01789 441.006 3.11846 439.566 2.00895 439.566C0.899435 439.566 0 441.006 0 442.783ZM389.233 231.085L393 233.964V227L389.233 229.879V231.085ZM2.00895 443.386H99.0275V442.18H2.00895V443.386ZM159.673 346.283V326.982H158.919V346.283H159.673ZM219.564 231.085H389.61V229.879H219.564V231.085ZM159.673 326.982C159.673 274.02 186.487 231.085 219.564 231.085V229.879C186.071 229.879 158.919 273.354 158.919 326.982H159.673ZM99.0275 443.386C132.521 443.386 159.673 399.911 159.673 346.283H158.919C158.919 399.246 132.104 442.18 99.0275 442.18V443.386Z";
+const STATIC_PATH2_D =
+  "M1040 332.906C1040 335.167 1038.77 337 1037.26 337C1035.75 337 1034.52 335.167 1034.52 332.906C1034.52 330.645 1035.75 328.812 1037.26 328.812C1038.77 328.812 1040 330.645 1040 332.906ZM879.134 226.2L874 229.864V221L879.134 224.665V226.2ZM1037.26 333.673H986.715V332.138H1037.26V333.673ZM914.839 226.2H878.621V224.665H914.839V226.2ZM950.264 279.169C950.264 249.915 934.404 226.2 914.839 226.2V224.665C934.971 224.665 951.29 249.067 951.29 279.169H950.264ZM986.715 333.673C966.583 333.673 950.264 309.271 950.264 279.169H951.29C951.29 308.423 967.151 332.138 986.715 332.138V333.673Z";
+
 interface WheelProps {
   boxesData: { title: string; subtitle: string }[];
 }
 
-const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
+const WheelMobile: React.FC<WheelProps> = ({ boxesData }) => {
   const [windowWidth, setWindowWidth] = useState(
     typeof window !== "undefined" ? window.innerWidth : 1200,
   );
@@ -64,10 +76,9 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
   }, []);
 
   const responsiveScale = useMemo(() => {
-    if (windowWidth < 640) return 2.6;
-    if (windowWidth < 768) return 2.2;
-    if (windowWidth < 1024) return 1.8;
-    return 1.0;
+    if (windowWidth < 640) return 2.2;
+    if (windowWidth < 768) return 1.9;
+    return 1.6;
   }, [windowWidth]);
 
   const BOX_DATA = useMemo(
@@ -207,9 +218,9 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
         });
 
         // Update single top popup text
-        const titleEl = document.getElementById("wheel-popup-title");
-        const sub1El = document.getElementById("wheel-popup-sub1");
-        const sub2El = document.getElementById("wheel-popup-sub2");
+        const titleEl = document.getElementById("wm-wheel-popup-title");
+        const sub1El = document.getElementById("wm-wheel-popup-sub1");
+        const sub2El = document.getElementById("wm-wheel-popup-sub2");
         if (titleEl && sub1El && sub2El) {
           titleEl.textContent = BOX_DATA[idx].title;
           sub1El.textContent = BOX_DATA[idx].subtitleLines[0] || "";
@@ -278,85 +289,17 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
     return () => ctx.revert();
   }, [boxes]);
 
-  /*
-  const handleBoxMouseEnter = (i: number) => {
-    // Glow the hovered box
-    const rect = boxRectRefs.current[i];
-    const glow = boxGlowRefs.current[i];
-    const icon = boxIconRefs.current[i];
-    if (rect && glow && icon) {
-      gsap.to(rect, {
-        attr: { stroke: "#0086F0" },
-        duration: 0.3,
-        overwrite: "auto",
-      });
-      gsap.to(glow, { opacity: 1, duration: 0.3, overwrite: "auto" });
-      gsap.to(icon, {
-        attr: { stroke: "#0086F0" },
-        duration: 0.3,
-        overwrite: "auto",
-      });
-    }
-
-    // Show popup instantly — no animation
-    const popup = boxPopupRefs.current[i];
-    if (popup) {
-      gsap.killTweensOf(popup);
-      gsap.set(popup, { opacity: 1, scale: 1 });
-    }
-  };
-  */
-
-  /*
-  const handleBoxMouseLeave = (i: number) => {
-    if (i === 0) return;
-
-    // Restore hovered box to neutral if it's not the active top one
-    if (i !== litIndexRef.current) {
-      const rect = boxRectRefs.current[i];
-      const glow = boxGlowRefs.current[i];
-      const icon = boxIconRefs.current[i];
-      if (rect && glow && icon) {
-        gsap.to(rect, {
-          attr: { stroke: "#D9D9D9" },
-          duration: 0.3,
-          overwrite: "auto",
-        });
-        gsap.to(glow, { opacity: 0, duration: 0.3, overwrite: "auto" });
-        gsap.to(icon, {
-          attr: { stroke: "#9CA3AF" },
-          duration: 0.3,
-          overwrite: "auto",
-        });
-      }
-
-      // Kill any in-progress tween and hide popup instantly
-      const popup = boxPopupRefs.current[i];
-      if (popup) {
-        gsap.killTweensOf(popup);
-        gsap.set(popup, { opacity: 0, scale: 0.85 });
-      }
-    }
-  };
-  */
-
   return (
-    // No longer applies its own 70% breakpoint width — the parent
-    // (Production.tsx) already sizes this component's container to
-    // lg:w-[calc(70%-1.5rem)]. Applying it again here would shrink the
-    // wheel to ~70% of that 70% column (~49% of the screen) instead of
-    // filling the full 70% column as intended. This div now just fills
-    // whatever container it's placed in.
     <div className="w-full flex items-center justify-center relative">
       <svg
-        viewBox="0 0 1495 494"
+        viewBox="0 0 1040 453"
         className="w-full h-auto overflow-visible"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
           <filter
-            id="orange-glow"
+            id="wm-orange-glow"
             x="-50%"
             y="-50%"
             width="200%"
@@ -390,7 +333,7 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
           </filter>
 
           <filter
-            id="popup-shadow"
+            id="wm-popup-shadow"
             x="-50%"
             y="-50%"
             width="200%"
@@ -407,7 +350,7 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
           </filter>
 
           <linearGradient
-            id="centerRingGradient"
+            id="wm-centerRingGradient"
             gradientUnits="userSpaceOnUse"
             x1={RING_CENTER.x - RING_RADIUS}
             y1={RING_CENTER.y - RING_RADIUS}
@@ -444,13 +387,13 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
             />
           </linearGradient>
 
-          <linearGradient id="glowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient id="wm-glowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#5ACFFE" />
             <stop offset="100%" stopColor="#0086F0" />
           </linearGradient>
 
           <filter
-            id="ring-glow"
+            id="wm-ring-glow"
             x="-50%"
             y="-50%"
             width="200%"
@@ -472,19 +415,19 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
           stroke="#FFFFFF"
           strokeWidth="2"
         />
-        <circle cx="1006" cy="227" r="138" stroke="#FFFFFF" strokeWidth="2" />
+        <circle cx="633" cy="227" r="138" stroke="#FFFFFF" strokeWidth="2" />
 
         <circle
           cx={RING_CENTER.x}
           cy={RING_CENTER.y}
           r={RING_RADIUS}
           fill="none"
-          stroke="url(#centerRingGradient)"
+          stroke="url(#wm-centerRingGradient)"
           strokeWidth="10"
-          filter="url(#ring-glow)"
+          filter="url(#wm-ring-glow)"
         />
 
-        <circle cx="1005.5" cy="226.5" r="50.5" fill="transparent" />
+        <circle cx="632.5" cy="226.5" r="50.5" fill="transparent" />
 
         <g
           transform={`translate(${RING_CENTER.x - CENTER_ICON_SIZE / 2}, ${
@@ -498,74 +441,34 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
           />
         </g>
 
-        <path
-          d="M0 489.433C0 491.594 1.75198 493.345 3.91315 493.345C6.07433 493.345 7.82631 491.594 7.82631 489.433C7.82631 487.272 6.07433 485.52 3.91315 485.52C1.75198 485.52 0 487.272 0 489.433ZM758.174 231.968L765.511 235.47V227L758.174 230.501V231.968ZM3.91315 490.166H192.892V488.699H3.91315V490.166ZM311.02 372.07V348.598H309.553V372.07H311.02ZM427.681 231.968H758.907V230.501H427.681V231.968ZM311.02 348.598C311.02 284.185 363.251 231.968 427.681 231.968V230.501C362.441 230.501 309.553 283.375 309.553 348.598H311.02ZM192.892 490.166C258.133 490.166 311.02 437.293 311.02 372.07H309.553C309.553 436.483 257.321 488.699 192.892 488.699V490.166Z"
-          fill="#FFFFFF"
-        />
+        <path d={STATIC_PATH1_D} fill="#FFFFFF" />
 
-        <path
-          d="M1495 332.906C1495 335.167 1493.17 337 1490.91 337C1488.65 337 1486.82 335.167 1486.82 332.906C1486.82 330.645 1488.65 328.812 1490.91 328.812C1493.17 328.812 1495 330.645 1495 332.906ZM1254.67 226.2L1247 229.864V221L1254.67 224.665V226.2ZM1490.91 333.673H1415.39V332.138H1490.91V333.673ZM1308.01 226.2H1253.9V224.665H1308.01V226.2ZM1360.94 279.169C1360.94 249.915 1337.24 226.2 1308.01 226.2V224.665C1338.09 224.665 1362.47 249.067 1362.47 279.169H1360.94ZM1415.39 333.673C1385.32 333.673 1360.94 309.271 1360.94 279.169H1362.47C1362.47 308.423 1386.16 332.138 1415.39 332.138V333.673Z"
-          fill="#FFFFFF"
-        />
+        <path d={STATIC_PATH2_D} fill="#FFFFFF" />
 
         <path
           ref={path1Ref}
-          d="M3.91315 489.433H192.892C258.133 489.433 311.02 436.483 311.02 372.07V348.598C311.02 284.185 363.251 231.968 427.681 231.968H758.907"
+          d={PATH1_D}
           fill="none"
           stroke="#0086F0"
           strokeWidth="4"
           strokeLinecap="round"
-          filter="url(#orange-glow)"
+          filter="url(#wm-orange-glow)"
         />
 
         <path
           ref={path2Ref}
-          d="M1253.9 225.433H1308.01C1337.24 225.433 1360.94 249.169 1360.94 279.169C1360.94 309.271 1385.32 333.673 1415.39 333.673H1490.91"
+          d={PATH2_D}
           fill="none"
           stroke="#0086F0"
           strokeWidth="4"
           strokeLinecap="round"
-          filter="url(#orange-glow)"
+          filter="url(#wm-orange-glow)"
         />
 
         <g ref={wheelGroupRef}>
           {boxes.map((pos, i) => {
             const { icon: Icon } = BOX_DATA[i];
             const iconSize = 26;
-
-            // Directional popup positioning
-            /*
-            const sideGap = 14;
-            const cardW = POPUP_WIDTH;
-            const cardH = 40;
-
-            // Right side: indices 0–3 | Bottom: index 4 | Left: indices 5–7
-            const direction: "right" | "left" | "bottom" =
-              i === 4 ? "bottom" : i >= 5 ? "left" : "right";
-
-            let sidePopupX: number;
-            let sidePopupY: number;
-            let scaleOriginX: number;
-            let scaleOriginY: number;
-
-            if (direction === "right") {
-              sidePopupX = pos.x + BOX_WIDTH + sideGap;
-              sidePopupY = pos.cy - cardH / 2;
-              scaleOriginX = sidePopupX; // left edge of card
-              scaleOriginY = pos.cy;
-            } else if (direction === "left") {
-              sidePopupX = pos.x - sideGap - cardW;
-              sidePopupY = pos.cy - cardH / 2;
-              scaleOriginX = sidePopupX + cardW; // right edge of card
-              scaleOriginY = pos.cy;
-            } else {
-              // bottom
-              sidePopupX = pos.cx - cardW / 2;
-              sidePopupY = pos.y + BOX_HEIGHT + sideGap;
-              scaleOriginX = pos.cx;
-              scaleOriginY = sidePopupY; // top edge of card
-            }
-            */
 
             return (
               <g
@@ -574,10 +477,6 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
                   boxCounterRefs.current[i] = el;
                 }}
                 className="cursor-default"
-                /*
-                onMouseEnter={() => handleBoxMouseEnter(i)}
-                onMouseLeave={() => handleBoxMouseLeave(i)}
-                */
               >
                 <rect
                   ref={(el) => {
@@ -591,7 +490,7 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
                   fill="none"
                   stroke="#0086F0"
                   strokeWidth="3"
-                  filter="url(#orange-glow)"
+                  filter="url(#wm-orange-glow)"
                   opacity="0"
                 />
                 <rect
@@ -622,45 +521,6 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
                     strokeWidth={1.75}
                   />
                 </g>
-
-                {/* Directional popup — title only, no arrow */}
-                {/*
-                <g
-                  transform={`translate(${scaleOriginX}, ${scaleOriginY}) scale(${responsiveScale}) translate(${-scaleOriginX}, ${-scaleOriginY})`}
-                >
-                  <g
-                    ref={(el) => {
-                      boxPopupRefs.current[i] = el;
-                    }}
-                    opacity="0"
-                    style={{
-                      transformOrigin: `${scaleOriginX}px ${scaleOriginY}px`,
-                    }}
-                  >
-                    <rect
-                      x={sidePopupX}
-                      y={sidePopupY}
-                      width={cardW}
-                      height={cardH}
-                      rx="8"
-                      fill="#FFFFFF"
-                      stroke="#E5E7EB"
-                      strokeWidth="1"
-                      filter="url(#popup-shadow)"
-                    />
-                    <text
-                      x={sidePopupX + cardW / 2}
-                      y={sidePopupY + cardH / 2 + 6}
-                      textAnchor="middle"
-                      fontSize="15"
-                      fontWeight="700"
-                      fill="#111827"
-                    >
-                      {title}
-                    </text>
-                  </g>
-                </g>
-                */}
               </g>
             );
           })}
@@ -668,7 +528,7 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
 
         {/* Single Static Popup — shown above the active box during auto-rotation */}
         <g
-          transform={`translate(1006, -6.5) scale(${responsiveScale}) translate(-1006, 6.5)`}
+          transform={`translate(633, -6.5) scale(${responsiveScale}) translate(-633, 6.5)`}
         >
           <g
             ref={singlePopupRef}
@@ -676,7 +536,7 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
             style={{ transformOrigin: "50% 100%" }}
           >
             <rect
-              x="891"
+              x="518"
               y="-88.5"
               width={POPUP_WIDTH}
               height={POPUP_HEIGHT}
@@ -684,17 +544,17 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
               fill="#FFFFFF"
               stroke="#E5E7EB"
               strokeWidth="1"
-              filter="url(#popup-shadow)"
+              filter="url(#wm-popup-shadow)"
             />
             <polygon
-              points="999,-14.5 1013,-14.5 1006,-6.5"
+              points="626,-14.5 640,-14.5 633,-6.5"
               fill="#FFFFFF"
               stroke="#E5E7EB"
               strokeWidth="1"
             />
             <text
-              id="wheel-popup-title"
-              x="1006"
+              id="wm-wheel-popup-title"
+              x="633"
               y="-63.5"
               textAnchor="middle"
               fontSize="17.5"
@@ -704,8 +564,8 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
               Creative Strategy
             </text>
             <text
-              id="wheel-popup-sub1"
-              x="1006"
+              id="wm-wheel-popup-sub1"
+              x="633"
               y="-43.5"
               textAnchor="middle"
               fontSize="13.5"
@@ -714,8 +574,8 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
               We research, analyze &amp; craft
             </text>
             <text
-              id="wheel-popup-sub2"
-              x="1006"
+              id="wm-wheel-popup-sub2"
+              x="633"
               y="-28.5"
               textAnchor="middle"
               fontSize="13.5"
@@ -730,4 +590,4 @@ const Wheel: React.FC<WheelProps> = ({ boxesData }) => {
   );
 };
 
-export default Wheel;
+export default WheelMobile;

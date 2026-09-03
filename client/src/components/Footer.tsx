@@ -289,14 +289,14 @@ const Footer = ({ isAdminMode = false }: FooterProps) => {
                 </div>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                   <Link
-                    to="#"
+                    to={isAdminMode || Boolean(localStorage.getItem("adminToken")) ? "/admin/terms-and-conditions" : "/terms-and-conditions"}
                     className="hover:text-orange-500 transition-colors duration-200"
                   >
                     Terms and Conditions
                   </Link>
                   <span className="text-zinc-700">|</span>
                   <Link
-                    to="#"
+                    to={isAdminMode || Boolean(localStorage.getItem("adminToken")) ? "/admin/privacy-policy" : "/privacy-policy"}
                     className="hover:text-orange-500 transition-colors duration-200"
                   >
                     Privacy Policy
@@ -536,8 +536,7 @@ const Footer = ({ isAdminMode = false }: FooterProps) => {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-10 text-[12.5px] text-zinc-500">
           <div className="space-y-1.5 text-center md:text-left leading-relaxed">
             <p>
-              © All Rights Reserved | {footer.brand} 2026 | Designed & Developed
-              by Fahim Shahriyar Mugdho
+              © 2026 {footer.brand}. All Rights Reserved.
             </p>
           </div>
         </div>

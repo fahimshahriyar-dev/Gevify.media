@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Pencil, Plus, Trash2, UserRound } from "lucide-react";
 import EditModalOverlay from "../../components/EditModalOverlay";
 import { gsap } from "gsap";
+import { useNavbarRightOffset } from "../../hooks/useNavbarRight";
 import type { Review } from "./Home";
 
 interface ReviewsProps {
@@ -27,6 +28,7 @@ const Reviews = ({
   active = false,
   onAnimationComplete
 }: ReviewsProps) => {
+  const navbarRight = useNavbarRightOffset(isAdminMode);
   const [editReviews, setEditReviews] = useState<Review[]>([]);
   const [saving, setSaving] = useState(false);
 
@@ -112,7 +114,8 @@ const Reviews = ({
       {isAdminMode && (
         <button
           onClick={startEditing}
-          className="absolute top-24 right-6 md:top-20 md:right-10 z-50 p-2.5 bg-[#06102F]/90 hover:bg-[#0086F0]/80 border border-[#0086F0]/50 hover:border-[#0086F0] text-[#5ACFFE] hover:text-white rounded-full transition-all duration-200 cursor-pointer shadow-lg hover:shadow-[#0086F0]/30 backdrop-blur-md"
+          className="absolute top-24 z-50 p-2.5 bg-[#06102F]/90 hover:bg-[#0086F0]/80 border border-[#0086F0]/50 hover:border-[#0086F0] text-[#5ACFFE] hover:text-white rounded-full transition-all duration-200 cursor-pointer shadow-lg hover:shadow-[#0086F0]/30 backdrop-blur-md"
+          style={{ right: navbarRight }}
           title="Edit Reviews"
         >
           <Pencil className="w-4 h-4" />

@@ -14,6 +14,7 @@ import { gsap } from "gsap";
 import type { SolutionCard, BrandsData } from "./Home";
 import background2 from "../../assets/images/background_2.webp";
 import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
+import { useNavbarRightOffset } from "../../hooks/useNavbarRight";
 
 type EditPanel = "title" | "brands" | null;
 
@@ -95,6 +96,7 @@ const OurSolution = ({
   onUpdateSolution,
   onUpdateBrands,
 }: OurSolutionProps) => {
+  const navbarRight = useNavbarRightOffset(isAdminMode);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const cardsContainerRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -271,7 +273,8 @@ const OurSolution = ({
       {isAdminMode && (
         <button
           onClick={startEditingSolution}
-          className="absolute top-24 right-6 md:top-20 md:right-10 z-50 p-2.5 bg-[#06102F]/90 hover:bg-[#0086F0]/80 border border-[#0086F0]/50 hover:border-[#0086F0] text-[#5ACFFE] hover:text-white rounded-full transition-all duration-200 cursor-pointer shadow-lg hover:shadow-[#0086F0]/30 backdrop-blur-md"
+          className="absolute top-24 z-50 p-2.5 bg-[#06102F]/90 hover:bg-[#0086F0]/80 border border-[#0086F0]/50 hover:border-[#0086F0] text-[#5ACFFE] hover:text-white rounded-full transition-all duration-200 cursor-pointer shadow-lg hover:shadow-[#0086F0]/30 backdrop-blur-md"
+          style={{ right: navbarRight }}
           title="Edit Solution Section & Cards"
         >
           <Pencil className="w-4 h-4" />
@@ -301,7 +304,7 @@ const OurSolution = ({
 
         <div
           ref={cardsContainerRef}
-          className="relative z-10 w-full mt-10 sm:mt-16 lg:mt-20 flex flex-col gap-4 px-4 sm:px-6 lg:px-8"
+          className="relative z-10 w-full mt-10 sm:mt-16 lg:mt-20 flex flex-col gap-4 px-3 sm:px-4 lg:px-8"
         >
           {/* Row 1 Cards */}
           <div className="flex flex-col lg:flex-row gap-4 justify-center">
@@ -406,7 +409,8 @@ const OurSolution = ({
         {isAdminMode && (
           <button
             onClick={startEditingBrands}
-            className="absolute top-24 right-6 md:top-20 md:right-10 z-50 p-2.5 bg-[#06102F]/90 hover:bg-[#0086F0]/80 border border-[#0086F0]/50 hover:border-[#0086F0] text-[#5ACFFE] hover:text-white rounded-full transition-all duration-200 cursor-pointer shadow-lg hover:shadow-[#0086F0]/30 backdrop-blur-md"
+            className="absolute top-24 z-50 p-2.5 bg-[#06102F]/90 hover:bg-[#0086F0]/80 border border-[#0086F0]/50 hover:border-[#0086F0] text-[#5ACFFE] hover:text-white rounded-full transition-all duration-200 cursor-pointer shadow-lg hover:shadow-[#0086F0]/30 backdrop-blur-md"
+            style={{ right: navbarRight }}
             title="Edit Brands"
           >
             <Pencil className="w-4 h-4" />

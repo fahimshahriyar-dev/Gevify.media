@@ -6,7 +6,10 @@ import './style.css'
 const Home = lazy(() => import('./pages/Home/Home'))
 const Work = lazy(() => import('./pages/Work'))
 const About = lazy(() => import('./pages/About'))
+const Solution = lazy(() => import('./pages/Solution'))
 const Contact = lazy(() => import('./pages/Contact'))
+const TermsAndConditions = lazy(() => import('./pages/Terms&conditions'))
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'))
 const AdminSignin = lazy(() => import('./pages/Authentication/AdminSignin'))
 const AdminSignup = lazy(() => import('./pages/Authentication/AdminSignup'))
 const AdminProfile = lazy(() => import('./pages/AdminProfile'))
@@ -32,11 +35,18 @@ createRoot(document.getElementById('app')!).render(
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/hero" element={<Home />} />
           <Route path="/work" element={<Work />} />
           <Route path="/about" element={<About />} />
+          <Route path="/solution" element={<Solution />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/admin/terms-and-conditions" element={<TermsAndConditions isAdminMode={true} />} />
+          <Route path="/admin/privacy-policy" element={<PrivacyPolicy isAdminMode={true} />} />
           <Route path="/admin/work" element={<Work isAdminMode={true} />} />
           <Route path="/admin/about" element={<About isAdminMode={true} />} />
+          <Route path="/admin/solution" element={<Solution isAdminMode={true} />} />
           <Route path="/admin/contact" element={<Contact isAdminMode={true} />} />
           <Route path="/admin/signin" element={<AdminSignin />} />
           <Route path="/admin/signup" element={<AdminSignup />} />
