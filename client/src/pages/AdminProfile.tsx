@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { API_BASE } from "../config";
 import { useNavigate } from "react-router-dom";
 import {
   User,
@@ -99,7 +100,7 @@ const AdminProfile = () => {
 
     const fetchMe = async () => {
       try {
-        const res = await fetch("https://api.gevify.media/api/admin/me", {
+        const res = await fetch(`${API_BASE}/api/admin/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) {
@@ -125,7 +126,7 @@ const AdminProfile = () => {
   // Fetch signup code if superadmin
   useEffect(() => {
     if (user && user.role === "superadmin" && activeTab === "profile") {
-      fetch("https://api.gevify.media/api/admin/signup-code", {
+      fetch(`${API_BASE}/api/admin/signup-code`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => res.json())
@@ -140,7 +141,7 @@ const AdminProfile = () => {
   useEffect(() => {
     if (activeTab === "applications" && token) {
       setLoadingApps(true);
-      fetch("https://api.gevify.media/api/admin/applications", {
+      fetch(`${API_BASE}/api/admin/applications`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => res.json())
@@ -156,7 +157,7 @@ const AdminProfile = () => {
   useEffect(() => {
     if (activeTab === "team" && token) {
       setLoadingTeam(true);
-      fetch("https://api.gevify.media/api/admin/team", {
+      fetch(`${API_BASE}/api/admin/team`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => res.json())
@@ -186,7 +187,7 @@ const AdminProfile = () => {
     setUpdatingProfile(true);
     try {
       const res = await fetch(
-        "https://api.gevify.media/api/admin/profile",
+        `${API_BASE}/api/admin/profile`,
         {
           method: "PUT",
           headers: {
@@ -235,7 +236,7 @@ const AdminProfile = () => {
     setUpdatingCode(true);
     try {
       const res = await fetch(
-        "https://api.gevify.media/api/admin/signup-code",
+        `${API_BASE}/api/admin/signup-code`,
         {
           method: "PUT",
           headers: {
@@ -271,7 +272,7 @@ const AdminProfile = () => {
   const handleToggleCheck = async (id: string) => {
     try {
       const res = await fetch(
-        `https://api.gevify.media/api/admin/applications/${id}/check`,
+        `${API_BASE}/api/admin/applications/${id}/check`,
         {
           method: "PUT",
           headers: { Authorization: `Bearer ${token}` },
@@ -301,7 +302,7 @@ const AdminProfile = () => {
 
     try {
       const res = await fetch(
-        "https://api.gevify.media/api/admin/team/role",
+        `${API_BASE}/api/admin/team/role`,
         {
           method: "PUT",
           headers: {

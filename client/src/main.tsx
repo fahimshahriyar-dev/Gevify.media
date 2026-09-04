@@ -2,6 +2,7 @@ import { StrictMode, lazy, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './style.css'
+import { syncFaviconFromContent } from './utils/favicon'
 
 const Home = lazy(() => import('./pages/Home/Home'))
 const Work = lazy(() => import('./pages/Work'))
@@ -28,6 +29,8 @@ const PageLoader = () => (
     </div>
   </div>
 );
+
+syncFaviconFromContent();
 
 createRoot(document.getElementById('app')!).render(
   <StrictMode>

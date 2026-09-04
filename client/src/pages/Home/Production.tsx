@@ -185,7 +185,7 @@ const Production: React.FC<ProductionProps> = ({
   return (
     <>
       <section
-        className="w-full min-h-screen text-slate-900 px-4 sm:px-6 md:px-12 lg:px-20 select-none relative overflow-hidden pt-30 sm:pt-40 lg:pt-50"
+        className="w-full min-h-mobile-screen text-slate-900 px-4 sm:px-6 md:px-12 lg:px-20 select-none relative overflow-hidden pt-30 sm:pt-40 lg:pt-50"
         style={{
           background:
             "radial-gradient(circle at 50% 25%, #dbe2ef 0%, #c3cbd9 45%, #a4b0c1 75%, #8391a5 100%)",
@@ -208,7 +208,7 @@ const Production: React.FC<ProductionProps> = ({
           Swap to `max-w-none` (or drop max-w-* entirely) if you want it
           to use the full viewport width edge-to-edge on very large screens.
         */}
-        <div className="w-full max-w-[1600px] mx-auto h-auto lg:h-[calc(100vh-270px)] flex flex-col lg:flex-row items-center lg:items-center justify-between gap-8 lg:gap-12 relative z-10">
+        <div className="w-full max-w-[1600px] mx-auto h-auto lg:h-[calc(100dvh-270px)] flex flex-col lg:flex-row items-center lg:items-center justify-between gap-8 lg:gap-12 relative z-10">
           {/*
             Locked to exactly 30% on lg+ (matching the Wheel's 70%) instead
             of the old 35% / 38% / 45% breakpoint overrides, so the split

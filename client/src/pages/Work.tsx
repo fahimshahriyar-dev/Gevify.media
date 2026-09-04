@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useLayoutEffect } from "react";
+import { API_BASE } from "../config";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -71,8 +72,13 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
   const pageStart = currentPage * PAGE_SIZE;
   const pageVideos = workVideos.slice(pageStart, pageStart + PAGE_SIZE);
 
+  const goToPage = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const fetchWorkPage = () => {
-    fetch("https://api.gevify.media/api/content")
+    fetch(`${API_BASE}/api/content`)
       .then((res) => res.json())
       .then((data) => {
         if (data.workPage) {
@@ -159,7 +165,7 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const res = await fetch(
-        "https://api.gevify.media/api/content/work-page",
+        `${API_BASE}/api/content/work-page`,
         {
           method: "PUT",
           headers: {
@@ -265,7 +271,7 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
             className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 pt-4 shrink-0"
           >
             <button
-              onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
+              onClick={() => goToPage(Math.max(0, currentPage - 1))}
               disabled={currentPage === 0}
               className="px-3 sm:px-4 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all text-sm font-semibold cursor-pointer"
             >
@@ -274,7 +280,7 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
             {Array.from({ length: totalPages }, (_, i) => (
               <button
                 key={i}
-                onClick={() => setCurrentPage(i)}
+                onClick={() => goToPage(i)}
                 className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-sm font-bold transition-all cursor-pointer ${
                   i === currentPage
                     ? "bg-gradient-to-r from-[#0086F0] to-[#5ACFFE] text-white shadow-lg shadow-[#0086F0]/30"
@@ -286,7 +292,7 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
             ))}
             <button
               onClick={() =>
-                setCurrentPage(Math.min(totalPages - 1, currentPage + 1))
+                goToPage(Math.min(totalPages - 1, currentPage + 1))
               }
               disabled={currentPage >= totalPages - 1}
               className="px-3 sm:px-4 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all text-sm font-semibold cursor-pointer"

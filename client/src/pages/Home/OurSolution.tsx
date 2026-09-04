@@ -404,7 +404,7 @@ const OurSolution = ({
       </section>
 
       {/* Infinite slider section (Section 2 - Brands) */}
-      <section className="pt-20 sm:pt-30 lg:pt-40 pb-16 sm:pb-24 lg:pb-30 bg-black overflow-hidden relative flex flex-col gap-6 select-none group">
+      <section className="pt-20 sm:pt-30 lg:pt-40 pb-24 sm:pb-56 lg:pb-48 bg-black overflow-hidden relative flex flex-col gap-6 select-none group">
         {/* Brands Edit icon */}
         {isAdminMode && (
           <button
@@ -439,12 +439,12 @@ const OurSolution = ({
             ).map((item, idx) => (
               <div
                 key={`row1-${idx}`}
-                className="flex items-center justify-center h-14 sm:h-16 md:h-20 w-28 sm:w-36 md:w-48 lg:w-52 hover:scale-105 transition-all duration-300 cursor-pointer"
+                className="flex items-center justify-center h-20 w-40 hover:scale-105 transition-all duration-300 cursor-pointer"
               >
                 <img
                   src={optimizeCloudinaryUrl(item, 200)}
                   alt="Brand Logo"
-                  className="max-h-8 sm:max-h-12 md:max-h-16 max-w-full object-contain filter brightness-0 invert opacity-75 hover:opacity-100 transition-opacity duration-300"
+                  className="h-12 w-28 object-contain filter brightness-0 invert opacity-75 hover:opacity-100 transition-opacity duration-300"
                 />
               </div>
             ))}
@@ -472,12 +472,12 @@ const OurSolution = ({
             ).map((item, idx) => (
               <div
                 key={`row2-${idx}`}
-                className="flex items-center justify-center h-14 sm:h-16 md:h-20 w-28 sm:w-36 md:w-48 lg:w-52 hover:scale-105 transition-all duration-300 cursor-pointer"
+                className="flex items-center justify-center h-20 w-40 hover:scale-105 transition-all duration-300 cursor-pointer"
               >
                 <img
                   src={optimizeCloudinaryUrl(item, 200)}
                   alt="Brand Logo"
-                  className="max-h-8 sm:max-h-12 md:max-h-16 max-w-full object-contain filter brightness-0 invert opacity-75 hover:opacity-100 transition-opacity duration-300"
+                  className="h-12 w-28 object-contain filter brightness-0 invert opacity-75 hover:opacity-100 transition-opacity duration-300"
                 />
               </div>
             ))}

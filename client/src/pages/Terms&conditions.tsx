@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import { API_BASE } from "../config";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -96,7 +97,7 @@ const TermsAndConditions = ({ isAdminMode = false }: TermsAndConditionsProps) =>
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetch("https://api.gevify.media/api/content")
+    fetch(`${API_BASE}/api/content`)
       .then((res) => res.json())
       .then((data) => {
         if (data && data.termsAndConditions) {
@@ -142,7 +143,7 @@ const TermsAndConditions = ({ isAdminMode = false }: TermsAndConditionsProps) =>
     const token = localStorage.getItem("adminToken");
     try {
       const res = await fetch(
-        "https://api.gevify.media/api/content/terms-and-conditions",
+        `${API_BASE}/api/content/terms-and-conditions`,
         {
           method: "PUT",
           headers: {

@@ -41,7 +41,7 @@ const HomeWork = ({
 
   return (
     <div
-      className="w-full h-screen overflow-hidden flex flex-col justify-center items-center relative max-w-full"
+      className="w-full h-mobile-screen overflow-hidden flex flex-col justify-center items-center relative max-w-full"
       style={{
         background:
           "radial-gradient(circle at 50% 25%, #dbe2ef 0%, #c3cbd9 45%, #a4b0c1 75%, #8391a5 100%)",

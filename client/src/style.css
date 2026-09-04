@@ -7,6 +7,25 @@
   }
 }
 
+/* ── Mobile viewport height fix ──────────────────────────────────────────────
+   Mobile browsers include their chrome (address bar, nav bar) in `100vh`,
+   making sections taller than the visible screen. We use `100dvh` (dynamic
+   viewport height) which correctly excludes the browser UI on modern browsers,
+   with a `100vh` fallback for older browsers that don't support dvh.
+   For very old browsers we also expose --vh via JS (set in main.tsx / App.tsx).
+   ──────────────────────────────────────────────────────────────────────────── */
+.h-mobile-screen {
+  /* Fallback for very old browsers */
+  height: 100vh;
+  /* dvh correctly shrinks when the browser toolbar is visible */
+  height: 100dvh;
+}
+
+.min-h-mobile-screen {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
 @layer base {
   * {
     font-family: sans-serif;

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { API_BASE } from "../../config";
 import { useNavigate } from "react-router-dom";
 import { Lock, Mail, AlertCircle, ArrowRight } from "lucide-react";
 import authBg from "../../assets/images/auth_bg.webp";
@@ -17,7 +18,7 @@ const AdminSignin: React.FC = () => {
 
     try {
       const response = await fetch(
-        "https://api.gevify.media/api/admin/login",
+        `${API_BASE}/api/admin/login`,
         {
           method: "POST",
           headers: {

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import { API_BASE } from "../config";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -96,7 +97,7 @@ const PrivacyPolicy = ({ isAdminMode = false }: PrivacyPolicyProps) => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetch("https://api.gevify.media/api/content")
+    fetch(`${API_BASE}/api/content`)
       .then((res) => res.json())
       .then((data) => {
         if (data && data.privacyPolicy) {
@@ -142,7 +143,7 @@ const PrivacyPolicy = ({ isAdminMode = false }: PrivacyPolicyProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const res = await fetch(
-        "https://api.gevify.media/api/content/privacy-policy",
+        `${API_BASE}/api/content/privacy-policy`,
         {
           method: "PUT",
           headers: {

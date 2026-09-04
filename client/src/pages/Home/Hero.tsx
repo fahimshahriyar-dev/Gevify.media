@@ -74,10 +74,10 @@ const Hero: React.FC<HeroProps> = ({
   };
 
   return (
-    // h-dvh (dynamic viewport height) instead of h-screen so mobile browser
-    // chrome (address bar showing/hiding) doesn't cause layout jumps or clipping.
-    // min-h-screen kept as a fallback for browsers without dvh support.
-    <div className="relative w-full min-h-screen h-dvh flex flex-col items-center overflow-hidden bg-black">
+    // h-mobile-screen uses 100dvh (dynamic viewport height) so mobile browser
+    // chrome (address bar) is excluded from the height calculation, preventing
+    // sections from overflowing the visible screen area on mobile devices.
+    <div className="relative w-full h-mobile-screen flex flex-col items-center overflow-hidden bg-black">
       {/* Background Image — object-cover keeps it filling the box at any
           aspect ratio; object-position shifts responsively so the subject
           stays in frame on tall narrow (mobile) vs wide (desktop) screens. */}

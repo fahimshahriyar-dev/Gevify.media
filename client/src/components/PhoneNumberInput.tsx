@@ -24,7 +24,7 @@ const PhoneNumberInput = ({
   return (
     <div className="gevify-phone-input">
       <PhoneInput
-        country="bd"
+        country="us"
         value={value}
         onChange={(_value, _data, _event, formattedValue) =>
           onChange?.(toE164(formattedValue ?? ""))

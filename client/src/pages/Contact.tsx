@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
+import { API_BASE } from "../config";
 
 import Navbar from "../components/Navbar";
 import EditModalOverlay from "../components/EditModalOverlay";
@@ -10,6 +11,7 @@ import { gsap } from "gsap";
 import { useNavbarRightOffset } from "../hooks/useNavbarRight";
 import contactBg from "../assets/images/contact_bg.webp";
 import { optimizeCloudinaryUrl } from "../utils/cloudinary";
+import { updateFavicon } from "../utils/favicon";
 
 interface ContactProps {
   isAdminMode?: boolean;
@@ -53,6 +55,7 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
     "email",
   );
   const scrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const touchStartY = useRef<number | null>(null);
 
   // Refs for entrance animation targets
   const brandRef = useRef<HTMLDivElement>(null);
@@ -74,7 +77,7 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
 
   // Load dynamic contact content
   useEffect(() => {
-    fetch("https://api.gevify.media/api/content")
+    fetch(`${API_BASE}/api/content`)
       .then((res) => res.json())
       .then((data) => {
         if (data.logo) {
@@ -165,7 +168,7 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
     const token = localStorage.getItem("adminToken");
     try {
       const res = await fetch(
-        "https://api.gevify.media/api/content/contact",
+        `${API_BASE}/api/content/contact`,
         {
           method: "PUT",
           headers: {
@@ -200,7 +203,7 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
       if (draftLogo.trim() && draftLogo.trim() !== logo) {
         try {
           const logoRes = await fetch(
-            "https://api.gevify.media/api/content/logo",
+            `${API_BASE}/api/content/logo`,
             {
               method: "PUT",
               headers: {
@@ -212,7 +215,10 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
           );
           if (logoRes.ok) {
             const logoData = await logoRes.json();
-            if (logoData.logo) setLogo(logoData.logo);
+            if (logoData.logo) {
+              setLogo(logoData.logo);
+              updateFavicon(logoData.logo);
+            }
           }
         } catch (err) {
           console.error(err);
@@ -227,20 +233,20 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
     }
   };
 
-  // Listen for wheel events to toggle sections
+  // Listen for wheel + touch swipe events to toggle sections
   useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
+    const trigger = (deltaY: number) => {
       // Debounce to prevent rapid toggling
       if (scrollTimeout.current) return;
 
       // Don't toggle sections while the country dropdown is open
       if (document.querySelector(".flag-dropdown.open")) return;
 
-      if (e.deltaY > 0 && !showForm) {
-        // Scroll down → show form
+      if (deltaY > 0 && !showForm) {
+        // Scroll / swipe down → show form
         setShowForm(true);
-      } else if (e.deltaY < 0 && showForm) {
-        // Scroll up → show title
+      } else if (deltaY < 0 && showForm) {
+        // Scroll / swipe up → show title
         setShowForm(false);
       }
 
@@ -249,8 +255,32 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
       }, 600);
     };
 
+    // ── Desktop: mouse-wheel ──────────────────────────────────────────────
+    const handleWheel = (e: WheelEvent) => trigger(e.deltaY);
+
+    // ── Mobile / tablet: touch swipe ──────────────────────────────────────
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY.current = e.touches[0].clientY;
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (touchStartY.current === null) return;
+      const deltaY = touchStartY.current - e.changedTouches[0].clientY;
+      // Only fire if the swipe is at least 30px to avoid accidental taps
+      if (Math.abs(deltaY) < 30) return;
+      trigger(deltaY);
+      touchStartY.current = null;
+    };
+
     window.addEventListener("wheel", handleWheel, { passive: true });
-    return () => window.removeEventListener("wheel", handleWheel);
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd, { passive: true });
+
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
   }, [showForm]);
 
   const handleInputChange = (field: string, value: string) => {
@@ -286,7 +316,7 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
 
     try {
       const response = await fetch(
-        "https://api.gevify.media/api/applications",
+        `${API_BASE}/api/applications`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -319,7 +349,7 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
   };
 
   return (
-    <div className="relative w-full h-screen bg-[#06102F] overflow-hidden select-none text-white">
+    <div className="relative w-full h-mobile-screen bg-[#06102F] overflow-hidden select-none text-white">
       {/* Background image */}
       <div
         className="absolute inset-0 z-0 bg-cover bg-center"

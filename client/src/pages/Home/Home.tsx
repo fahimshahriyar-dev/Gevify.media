@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { API_BASE } from "../../config";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Pencil, ChevronUp, ChevronDown } from "lucide-react";
 import { lazy, Suspense } from "react";
@@ -188,7 +189,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
   // Fetch dynamic content
   const fetchContent = async () => {
     try {
-      const response = await fetch("https://api.gevify.media/api/content");
+      const response = await fetch(`${API_BASE}/api/content`);
       if (!response.ok) {
         throw new Error("Failed to load website content");
       }
@@ -216,7 +217,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const response = await fetch(
-        "https://api.gevify.media/api/content/hero",
+        `${API_BASE}/api/content/hero`,
         {
           method: "PUT",
           headers: {
@@ -245,7 +246,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const response = await fetch(
-        "https://api.gevify.media/api/content/work-videos",
+        `${API_BASE}/api/content/work-videos`,
         {
           method: "PUT",
           headers: {
@@ -277,7 +278,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const response = await fetch(
-        "https://api.gevify.media/api/content/solution",
+        `${API_BASE}/api/content/solution`,
         {
           method: "PUT",
           headers: {
@@ -310,7 +311,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const response = await fetch(
-        "https://api.gevify.media/api/content/reviews",
+        `${API_BASE}/api/content/reviews`,
         {
           method: "PUT",
           headers: {
@@ -339,7 +340,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const response = await fetch(
-        "https://api.gevify.media/api/content/faqs",
+        `${API_BASE}/api/content/faqs`,
         {
           method: "PUT",
           headers: {
@@ -368,7 +369,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const response = await fetch(
-        "https://api.gevify.media/api/content/brands",
+        `${API_BASE}/api/content/brands`,
         {
           method: "PUT",
           headers: {
@@ -399,7 +400,7 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const response = await fetch(
-        "https://api.gevify.media/api/content/production",
+        `${API_BASE}/api/content/production`,
         {
           method: "PUT",
           headers: {

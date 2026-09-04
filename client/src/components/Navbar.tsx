@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { API_BASE } from "../config";
 import { useNavigate, useLocation } from "react-router-dom";
 import gsap from "gsap";
 import {
@@ -11,6 +13,7 @@ import {
 } from "lucide-react";
 import EditModalOverlay from "./EditModalOverlay";
 import { optimizeCloudinaryUrl } from "../utils/cloudinary";
+import { updateFavicon } from "../utils/favicon";
 
 interface NavbarProps {
   whiteLogo?: boolean;
@@ -113,7 +116,7 @@ const Navbar = ({}: NavbarProps) => {
 
   // Fetch the current logo + brand from dynamic content
   useEffect(() => {
-    fetch("https://api.gevify.media/api/content")
+    fetch(`${API_BASE}/api/content`)
       .then((res) => res.json())
       .then((data) => {
         if (data && data.logo) setLogoUrl(data.logo);
@@ -143,7 +146,7 @@ const Navbar = ({}: NavbarProps) => {
       };
 
       const logoRes = await fetch(
-        "https://api.gevify.media/api/content/logo",
+        `${API_BASE}/api/content/logo`,
         {
           method: "PUT",
           headers,
@@ -155,10 +158,11 @@ const Navbar = ({}: NavbarProps) => {
         throw new Error(logoData.message || "Failed to update logo");
       }
       setLogoUrl(logoData.logo);
+      updateFavicon(logoData.logo);
 
       const newBrand = brandInput.trim() || footer.brand;
       const footerRes = await fetch(
-        "https://api.gevify.media/api/content/footer",
+        `${API_BASE}/api/content/footer`,
         {
           method: "PUT",
           headers,
@@ -351,63 +355,50 @@ const Navbar = ({}: NavbarProps) => {
           )}
         </div>
 
-        {/* Mobile dropdown menu */}
-        {menuOpen && (
-          <div className="absolute top-full mt-2 right-0 w-[min(80vw,280px)] bg-[#01061C]/60 backdrop-blur-2xl backdrop-saturate-150 border border-white/15 rounded-2xl p-2 shadow-[0_8px_32px_rgba(1,6,28,0.4),inset_0_1px_0_rgba(255,255,255,0.15)]">
-            <button
-              onClick={() => handleNavClick("home")}
-              className={mobileLinkClass("home")}
-            >
-              Home
-            </button>
-            <button
-              onClick={() => handleNavClick("work")}
-              className={mobileLinkClass("work")}
-            >
-              Work
-            </button>
-            <button
-              onClick={() => handleNavClick("about")}
-              className={mobileLinkClass("about")}
-            >
-              About
-            </button>
-            <button
-              onClick={() => handleNavClick("solution")}
-              className={mobileLinkClass("solution")}
-            >
-              Solution
-            </button>
-            <button
-              onClick={() => handleNavClick("contact")}
-              className={mobileLinkClass("contact")}
-            >
-              Contact
-            </button>
+        {/* Mobile menu — rendered via portal so backdrop-filter blurs the real page,
+            not just what's behind the navbar pill's own stacking context */}
+        {menuOpen && createPortal(
+          <>
+            <style>{`
+              @keyframes menu-slide-in {
+                from { opacity: 0; transform: translateY(-10px) scale(0.97); }
+                to   { opacity: 1; transform: translateY(0)     scale(1);    }
+              }
+              .menu-panel { animation: menu-slide-in 0.28s cubic-bezier(0.16,1,0.3,1) forwards; }
+            `}</style>
 
-            {isAdmin && (
-              <>
-                <div className="my-1.5 h-px bg-white/10" />
-                <button
-                  onClick={() => {
-                    setMenuOpen(false);
-                    navigate("/admin/profile");
-                  }}
-                  className="flex items-center gap-3 text-sm font-semibold text-white/80 hover:text-white hover:bg-[#0086F0]/10 transition-colors cursor-pointer text-left w-full py-2.5 px-4 rounded-xl border border-transparent hover:border-[#0086F0]/20"
-                >
-                  <User className="w-4 h-4 text-[#5ACFFE]" />
-                  Admin Profile
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center gap-3 text-sm font-semibold text-red-400 hover:text-white hover:bg-red-500/20 transition-colors cursor-pointer text-left w-full py-2.5 px-4 rounded-xl border border-transparent hover:border-red-500/30"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Logout
-                </button>
-              </>
-            )}
-          </div>
+            {/* Positioned to sit just below the navbar (top-4 + ~44px pill height) */}
+            <div
+              className="menu-panel fixed top-[72px] sm:top-[80px] right-3 sm:right-4 z-[9999] w-[min(88vw,300px)] rounded-2xl bg-[#01061C]/30 backdrop-blur-2xl backdrop-saturate-150 border border-white/15 p-2 shadow-[0_8px_32px_rgba(1,6,28,0.35),inset_0_1px_0_rgba(255,255,255,0.15)]"
+            >
+              <button onClick={() => handleNavClick("home")} className={mobileLinkClass("home")}>Home</button>
+              <button onClick={() => handleNavClick("work")} className={mobileLinkClass("work")}>Work</button>
+              <button onClick={() => handleNavClick("about")} className={mobileLinkClass("about")}>About</button>
+              <button onClick={() => handleNavClick("solution")} className={mobileLinkClass("solution")}>Solution</button>
+              <button onClick={() => handleNavClick("contact")} className={mobileLinkClass("contact")}>Contact</button>
+
+              {isAdmin && (
+                <>
+                  <div className="my-1.5 h-px bg-white/10" />
+                  <button
+                    onClick={() => { setMenuOpen(false); navigate("/admin/profile"); }}
+                    className="flex items-center gap-3 text-sm font-semibold text-white/80 hover:text-white hover:bg-[#0086F0]/10 transition-colors cursor-pointer text-left w-full py-2.5 px-4 rounded-xl border border-transparent hover:border-[#0086F0]/20"
+                  >
+                    <User className="w-4 h-4 text-[#5ACFFE]" />
+                    Admin Profile
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-3 text-sm font-semibold text-red-400 hover:text-white hover:bg-red-500/20 transition-colors cursor-pointer text-left w-full py-2.5 px-4 rounded-xl border border-transparent hover:border-red-500/30"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </button>
+                </>
+              )}
+            </div>
+          </>,
+          document.body
         )}
       </div>
 

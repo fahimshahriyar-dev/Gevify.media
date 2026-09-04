@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import { API_BASE } from "../config";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -43,7 +44,11 @@ const About = ({ isAdminMode = false }: AboutProps) => {
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch("https://api.gevify.media/api/content")
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/content`)
       .then((res) => res.json())
       .then((data) => {
         if (data.about) {
@@ -82,7 +87,7 @@ const About = ({ isAdminMode = false }: AboutProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const res = await fetch(
-        "https://api.gevify.media/api/content/about",
+        `${API_BASE}/api/content/about`,
         {
           method: "PUT",
           headers: {

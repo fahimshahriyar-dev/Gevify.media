@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { API_BASE } from "../../config";
 import { useNavigate } from "react-router-dom";
 import {
   Lock,
@@ -32,7 +33,7 @@ const AdminSignup: React.FC = () => {
 
     try {
       const response = await fetch(
-        "https://api.gevify.media/api/admin/signup",
+        `${API_BASE}/api/admin/signup`,
         {
           method: "POST",
           headers: {

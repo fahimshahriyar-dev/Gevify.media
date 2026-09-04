@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { API_BASE } from "../config";
 import { Link } from "react-router-dom";
 import EditModalOverlay from "./EditModalOverlay";
 import PhoneNumberInput, { isValidWhatsAppNumber } from "./PhoneNumberInput";
 import { Pencil, Image as ImageIcon } from "lucide-react";
 import footerBg from "../assets/images/footer_bg.webp";
 import { optimizeCloudinaryUrl } from "../utils/cloudinary";
+import { updateFavicon } from "../utils/favicon";
 
 interface FooterProps {
   isAdminMode?: boolean;
@@ -60,7 +62,7 @@ const Footer = ({ isAdminMode = false }: FooterProps) => {
 
   // Load dynamic footer content
   useEffect(() => {
-    fetch("https://api.gevify.media/api/content")
+    fetch(`${API_BASE}/api/content`)
       .then((res) => res.json())
       .then((data) => {
         if (data.logo) setLogo(data.logo);
@@ -95,7 +97,7 @@ const Footer = ({ isAdminMode = false }: FooterProps) => {
     const token = localStorage.getItem("adminToken");
     try {
       const res = await fetch(
-        "https://api.gevify.media/api/content/footer",
+        `${API_BASE}/api/content/footer`,
         {
           method: "PUT",
           headers: {
@@ -121,7 +123,7 @@ const Footer = ({ isAdminMode = false }: FooterProps) => {
 
       if (draftLogo.trim()) {
         const logoRes = await fetch(
-          "https://api.gevify.media/api/content/logo",
+          `${API_BASE}/api/content/logo`,
           {
             method: "PUT",
             headers: {
@@ -133,7 +135,10 @@ const Footer = ({ isAdminMode = false }: FooterProps) => {
         );
         if (!logoRes.ok) throw new Error("Failed to save logo");
         const logoData = await logoRes.json();
-        if (logoData.logo) setLogo(logoData.logo);
+        if (logoData.logo) {
+          setLogo(logoData.logo);
+          updateFavicon(logoData.logo);
+        }
       }
 
       setEditOpen(false);
@@ -174,7 +179,7 @@ const Footer = ({ isAdminMode = false }: FooterProps) => {
 
     try {
       const response = await fetch(
-        "https://api.gevify.media/api/applications",
+        `${API_BASE}/api/applications`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
