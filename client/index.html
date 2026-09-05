@@ -2,25 +2,109 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dsmkxcczo/image/upload/f_png,q_auto,w_192/v1786910291/logo_o11gn5.png" />
-    <link rel="apple-touch-icon" href="https://res.cloudinary.com/dsmkxcczo/image/upload/f_png,q_auto,w_192/v1786910291/logo_o11gn5.png" />
-    <meta name="description" content="Gevify Media produces AI-driven commercial videos, e-commerce content, and visual solutions to help brands expand their reach." />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- SEO -->
+    <meta
+      name="description"
+      content="Gevify Media produces AI-driven commercial videos, e-commerce content, and visual solutions to help brands expand their reach."
+    />
+
+    <meta
+      name="keywords"
+      content="Gevify Media, AI videos, commercial videos, e-commerce content, visual solutions, AI-driven video"
+    />
+
+    <meta name="author" content="Gevify Media" />
+
+    <!-- Viewport -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+
+    <!-- Search engine directives -->
+    <meta name="robots" content="index, follow" />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://gevify.media/" />
+
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://gevify.media/" />
+    <meta property="og:title" content="Gevify.media" />
+    <meta
+      property="og:description"
+      content="Gevify Media produces AI-driven commercial videos, e-commerce content, and visual solutions to help brands expand their reach."
+    />
+    <meta
+      property="og:image"
+      content="https://res.cloudinary.com/dsmkxcczo/image/upload/f_auto,q_auto/v1786910291/logo_o11gn5.png"
+    />
+
+    <!-- Twitter / X Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Gevify.media" />
+    <meta
+      name="twitter:description"
+      content="Gevify Media produces AI-driven commercial videos, e-commerce content, and visual solutions to help brands expand their reach."
+    />
+    <meta
+      name="twitter:image"
+      content="https://res.cloudinary.com/dsmkxcczo/image/upload/f_auto,q_auto/v1786910291/logo_o11gn5.png"
+    />
+
+    <!-- Page title -->
     <title>Gevify.media</title>
+
     <!-- Fonts: preconnect first, then load in parallel (non-blocking) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
-    <!-- Preconnect to Cloudinary early — the navbar logo (LCP element) comes from here -->
-    <link rel="preconnect" href="https://res.cloudinary.com" />
-    <!-- Preload the default navbar logo (LCP element) at the highest priority -->
-    <link rel="preload" as="image" href="https://res.cloudinary.com/dsmkxcczo/image/upload/f_auto,q_auto,w_160/v1786910291/logo_o11gn5.png" fetchpriority="high" />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
+    />
+
+    <!-- Preconnect to Cloudinary early -->
+    <link
+      rel="preconnect"
+      href="https://res.cloudinary.com"
+    />
+
+    <!-- Preload the default navbar logo (LCP element) -->
+    <link
+      rel="preload"
+      as="image"
+      href="https://res.cloudinary.com/dsmkxcczo/image/upload/f_auto,q_auto,w_160/v1786910291/logo_o11gn5.png"
+      fetchpriority="high"
+    />
+
     <!-- Preload hero background image -->
-    <link rel="preload" as="image" type="image/webp" href="/src/assets/images/background.webp" fetchpriority="high" />
+    <link
+      rel="preload"
+      as="image"
+      type="image/webp"
+      href="/src/assets/images/background.webp"
+      fetchpriority="high"
+    />
   </head>
+
   <body>
     <div id="app"></div>
-    <script type="module" src="/src/main.tsx"></script>
+
+    <script
+      type="module"
+      src="/src/main.tsx"
+    ></script>
   </body>
 </html>
-
