@@ -12,7 +12,10 @@ import {
 import EditModalOverlay from "../../components/EditModalOverlay";
 import { gsap } from "gsap";
 import type { SolutionCard, BrandsData } from "./Home";
-import background2 from "../../assets/images/background_2.webp";
+const SOLUTION_BG_URL = optimizeCloudinaryUrl(
+  "https://res.cloudinary.com/dsmkxcczo/image/upload/v1789493041/background_2_sqketj.webp",
+  1600,
+);
 import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
 import { useNavbarRightOffset } from "../../hooks/useNavbarRight";
 
@@ -284,8 +287,10 @@ const OurSolution = ({
       <section className="pt-30 sm:pt-40 lg:pt-55 relative overflow-hidden group">
         {/* Background image — pinned inside section, z-0 so it stays visible in normal-flow layout */}
         <img
-          src={background2}
+          src={SOLUTION_BG_URL}
           alt=""
+          loading="lazy"
+          decoding="async"
           aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover object-center select-none pointer-events-none z-0"
           draggable={false}

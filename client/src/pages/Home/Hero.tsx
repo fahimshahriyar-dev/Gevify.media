@@ -2,9 +2,31 @@
 
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
-import backgroundImage from '../../assets/images/background.webp';
 import { Pencil } from 'lucide-react';
 import { useNavbarRightOffset } from '../../hooks/useNavbarRight';
+import CloudinaryVideoPlayer from '../../components/CloudinaryVideoPlayer';
+import YouTubePlayer from '../../components/YouTubePlayer';
+import {
+  isCloudinaryVideoUrl,
+  getCloudinaryVideoThumbnail,
+  optimizeCloudinaryUrl,
+} from '../../utils/cloudinary';
+
+function extractYouTubeId(url: string): string | null {
+  if (!url) return null;
+  if (url.includes("youtu.be/"))
+    return url.split("youtu.be/")[1]?.split("?")[0] || null;
+  if (url.includes("watch?v="))
+    return url.split("watch?v=")[1]?.split("&")[0] || null;
+  if (url.includes("embed/"))
+    return url.split("embed/")[1]?.split("?")[0] || null;
+  return null;
+}
+
+const HERO_BG_URL = optimizeCloudinaryUrl(
+  "https://res.cloudinary.com/dsmkxcczo/image/upload/v1789493035/background_pr3h5r.png",
+  1600,
+);
 
 const Ai = lazy(() => import('../../components/animations/Ai'));
 const AiMobile = lazy(() => import('../../components/animations/Ai_mobile'));
@@ -27,6 +49,7 @@ const Hero: React.FC<HeroProps> = ({
   onUpdateHero
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isVideoLoading, setIsVideoLoading] = useState(true);
   const navigate = useNavigate();
   const navbarRight = useNavbarRightOffset(isAdminMode);
   
@@ -82,11 +105,10 @@ const Hero: React.FC<HeroProps> = ({
           aspect ratio; object-position shifts responsively so the subject
           stays in frame on tall narrow (mobile) vs wide (desktop) screens. */}
       <img 
-        src={backgroundImage} 
+        src={HERO_BG_URL} 
         alt="Background" 
-        loading="eager"
+        loading="lazy"
         decoding="async"
-        fetchPriority="high"
         className="absolute inset-0 w-full h-full object-cover object-right-top pointer-events-none select-none"
       />
       {/* Subtle overlay to keep text legible over the image on any device,
@@ -104,7 +126,7 @@ const Hero: React.FC<HeroProps> = ({
               setEditVideoUrl(videoUrl);
               setIsEditing(true);
             }}
-            className="absolute top-24 p-2 sm:p-2.5 bg-[#06102F]/90 hover:bg-[#0086F0]/80 border border-[#0086F0]/50 hover:border-[#0086F0] text-[#5ACFFE] hover:text-white rounded-full transition-all duration-200 cursor-pointer shadow-lg hover:shadow-[#0086F0]/30 backdrop-blur-md"
+            className="absolute top-24 z-50 p-2 sm:p-2.5 bg-[#06102F]/90 hover:bg-[#0086F0]/80 border border-[#0086F0]/50 hover:border-[#0086F0] text-[#5ACFFE] hover:text-white rounded-full transition-all duration-200 cursor-pointer shadow-lg hover:shadow-[#0086F0]/30 backdrop-blur-md"
             style={{ right: navbarRight }}
             title="Edit Hero Section"
           >
@@ -173,7 +195,10 @@ const Hero: React.FC<HeroProps> = ({
 
             {/* View Intro Button — top-most */}
             <button
-              onClick={() => setIsOpen(true)}
+              onClick={() => {
+                setIsVideoLoading(true);
+                setIsOpen(true);
+              }}
               className="hero-animate hero-delay-1 group flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-medium text-white/80 border border-white/10 hover:border-[#0086F0]/50 hover:text-white transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg hover:shadow-[#0086F0]/10 cursor-pointer"
               style={{ background: 'rgba(255,255,255,0.07)', backdropFilter: 'blur(8px)' }}
             >
@@ -290,15 +315,45 @@ const Hero: React.FC<HeroProps> = ({
               ✕
             </button>
 
-            {/* Embedded YouTube Video Container */}
+            {/* Video Container */}
             <div className="aspect-video w-full bg-black relative">
-              <iframe
-                src={getEmbedUrl(videoUrl)}
-                title="Intro Video"
-                className="w-full h-full border-0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              />
+              {isVideoLoading && (
+                <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 backdrop-blur-sm pointer-events-none">
+                  <div className="w-12 h-12 border-4 border-white/20 border-t-[#0086F0] rounded-full animate-spin" />
+                </div>
+              )}
+              {(() => {
+                if (isCloudinaryVideoUrl(videoUrl)) {
+                  return (
+                    <CloudinaryVideoPlayer
+                      key={videoUrl}
+                      src={videoUrl}
+                      poster={getCloudinaryVideoThumbnail(videoUrl)}
+                      onReady={() => setIsVideoLoading(false)}
+                    />
+                  );
+                }
+                const ytId = extractYouTubeId(videoUrl);
+                if (ytId) {
+                  return (
+                    <YouTubePlayer
+                      key={videoUrl}
+                      videoId={ytId}
+                      onReady={() => setIsVideoLoading(false)}
+                    />
+                  );
+                }
+                return (
+                  <iframe
+                    src={getEmbedUrl(videoUrl)}
+                    title="Intro Video"
+                    className="w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    onLoad={() => setIsVideoLoading(false)}
+                  />
+                );
+              })()}
             </div>
           </div>
         </div>

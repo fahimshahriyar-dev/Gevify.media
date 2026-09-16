@@ -151,6 +151,7 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
   const overlayDivRef = useRef<HTMLDivElement>(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [activeCardIndex, setActiveCardIndex] = useState<number>(-1);
+  const [isVideoLoading, setIsVideoLoading] = useState(true);
 
   // Notify parent page so it can hide overlapping UI (e.g. nav arrows) while the popup is open
   useEffect(() => {
@@ -181,8 +182,8 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
     let thumb = null;
     if (videoUrl) {
       thumb = isCloudinaryVideoUrl(videoUrl)
-        ? getCloudinaryVideoThumbnail(videoUrl)
-        : getYouTubeThumbnail(videoUrl);
+        ? getCloudinaryVideoThumbnail(videoUrl, 320) // compressed: 320px wide
+        : getYouTubeThumbnail(videoUrl); // mqdefault is already 320×180
     }
     return thumb || fallbackImages[i % fallbackImages.length];
   });
@@ -318,6 +319,7 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
       dragging = false;
       // If pointer wasn't dragged significantly, treat as a click on hovered card
       if (dragDistance < 6 && hoveredCardIndex !== -1) {
+        setIsVideoLoading(true);
         setActiveCardIndex(hoveredCardIndex);
         setIsPopupOpen(true);
       }
@@ -686,7 +688,10 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
           >
             {/* Left Arrow — side (md+ only) */}
             <button
-              onClick={() => setActiveCardIndex((prev) => (prev - 1 + 12) % 12)}
+              onClick={() => {
+                setIsVideoLoading(true);
+                setActiveCardIndex((prev) => (prev - 1 + 12) % 12);
+              }}
               className="hidden md:flex shrink-0 w-12 h-12 items-center justify-center rounded-full bg-white/5 hover:bg-white/15 text-white/70 hover:text-white hover:scale-110 active:scale-95 transition-all border border-white/10 cursor-pointer shadow-2xl backdrop-blur-sm"
               title="Previous Video"
             >
@@ -705,6 +710,11 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
 
               {/* Embedded Video Container */}
               <div className="aspect-video w-full bg-black relative">
+                {isVideoLoading && (
+                  <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 backdrop-blur-sm pointer-events-none">
+                    <div className="w-12 h-12 border-4 border-white/20 border-t-[#0086F0] rounded-full animate-spin" />
+                  </div>
+                )}
                 {(() => {
                   const videoUrl =
                     workVideos[activeCardIndex] ||
@@ -715,6 +725,7 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
                         key={activeCardIndex + ":" + videoUrl}
                         src={videoUrl}
                         poster={getCloudinaryVideoThumbnail(videoUrl)}
+                        onReady={() => setIsVideoLoading(false)}
                       />
                     );
                   }
@@ -724,6 +735,7 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
                       <YouTubePlayer
                         key={activeCardIndex + ":" + videoUrl}
                         videoId={ytId}
+                        onReady={() => setIsVideoLoading(false)}
                       />
                     );
                   }
@@ -735,6 +747,7 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
                       className="w-full h-full border-0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       allowFullScreen
+                      onLoad={() => setIsVideoLoading(false)}
                     />
                   );
                 })()}
@@ -743,7 +756,10 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
 
             {/* Right Arrow — side (md+ only) */}
             <button
-              onClick={() => setActiveCardIndex((prev) => (prev + 1) % 12)}
+              onClick={() => {
+                setIsVideoLoading(true);
+                setActiveCardIndex((prev) => (prev + 1) % 12);
+              }}
               className="hidden md:flex shrink-0 w-12 h-12 items-center justify-center rounded-full bg-white/5 hover:bg-white/15 text-white/70 hover:text-white hover:scale-110 active:scale-95 transition-all border border-white/10 cursor-pointer shadow-2xl backdrop-blur-sm"
               title="Next Video"
             >
@@ -753,14 +769,20 @@ const Slider: React.FC<SliderProps> = ({ workVideos = [] }) => {
             {/* Next / Previous buttons — bottom of video (sm only) */}
             <div className="flex items-center justify-between w-full gap-4 md:hidden">
               <button
-                onClick={() => setActiveCardIndex((prev) => (prev - 1 + 12) % 12)}
+                onClick={() => {
+                  setIsVideoLoading(true);
+                  setActiveCardIndex((prev) => (prev - 1 + 12) % 12);
+                }}
                 className="flex items-center justify-center gap-2 flex-1 py-3 rounded-lg bg-white/5 hover:bg-white/15 text-white/80 hover:text-white transition-all border border-white/10 text-sm font-semibold cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Previous
               </button>
               <button
-                onClick={() => setActiveCardIndex((prev) => (prev + 1) % 12)}
+                onClick={() => {
+                  setIsVideoLoading(true);
+                  setActiveCardIndex((prev) => (prev + 1) % 12);
+                }}
                 className="flex items-center justify-center gap-2 flex-1 py-3 rounded-lg bg-white/5 hover:bg-white/15 text-white/80 hover:text-white transition-all border border-white/10 text-sm font-semibold cursor-pointer"
               >
                 Next

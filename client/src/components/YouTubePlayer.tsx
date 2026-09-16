@@ -10,6 +10,7 @@ import {
 
 interface YouTubePlayerProps {
   videoId: string;
+  onReady?: () => void;
 }
 
 declare global {
@@ -85,7 +86,7 @@ const formatTime = (seconds: number): string => {
   return `${m}:${s.toString().padStart(2, "0")}`;
 };
 
-const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
+const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId, onReady }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YTPlayer | null>(null);
   const [iframeId] = useState(
@@ -155,6 +156,7 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
             setMuted(e.target.isMuted());
             setVolume(e.target.isMuted() ? 0 : e.target.getVolume() / 100);
             e.target.playVideo();
+            onReady?.();
             progressInterval = setInterval(() => {
               const p = playerRef.current;
               if (!p) return;
@@ -167,6 +169,7 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
             if (e.data === YTState.PLAYING) {
               setPlaying(true);
               setBuffering(false);
+              onReady?.();
             } else if (e.data === YTState.PAUSED) {
               setPlaying(false);
               setBuffering(false);

@@ -40,3 +40,25 @@ export const getCloudinaryVideoThumbnail = (
     `/video/upload/f_jpg,w_${width},q_auto/`,
   );
 };
+
+/**
+ * Optimizes a Cloudinary video URL by injecting quality, format, and width parameters.
+ * If the URL is not a Cloudinary video URL, it returns the original URL.
+ * 
+ * @param url The original Cloudinary video URL
+ * @param width Target video width (defaults to 1280 for web streaming)
+ */
+export const optimizeCloudinaryVideoUrl = (
+  url?: string | null,
+  width = 1280,
+): string => {
+  if (!url) return "";
+  if (isCloudinaryVideoUrl(url)) {
+    if (url.includes("/video/upload/f_auto")) return url;
+    return url.replace(
+      "/video/upload/",
+      `/video/upload/f_auto,q_auto,w_${width}/`,
+    );
+  }
+  return url;
+};

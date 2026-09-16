@@ -7,11 +7,15 @@ import {
   Maximize,
   Minimize,
 } from "lucide-react";
-import { getCloudinaryVideoThumbnail } from "../utils/cloudinary";
+import {
+  getCloudinaryVideoThumbnail,
+  optimizeCloudinaryVideoUrl,
+} from "../utils/cloudinary";
 
 interface CloudinaryVideoPlayerProps {
   src: string;
   poster?: string;
+  onReady?: () => void;
 }
 
 const formatTime = (seconds: number): string => {
@@ -24,11 +28,13 @@ const formatTime = (seconds: number): string => {
 const CloudinaryVideoPlayer: React.FC<CloudinaryVideoPlayerProps> = ({
   src,
   poster,
+  onReady,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [playing, setPlaying] = useState(false);
+  const [buffering, setBuffering] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [buffered, setBuffered] = useState(0);
@@ -144,13 +150,24 @@ const CloudinaryVideoPlayer: React.FC<CloudinaryVideoPlayerProps> = ({
     >
       <video
         ref={videoRef}
-        src={src}
+        src={optimizeCloudinaryVideoUrl(src)}
         poster={effectivePoster}
         className="w-full h-full object-contain bg-black"
         playsInline
         autoPlay
         onClick={handleVideoClick}
-        onPlay={handlePlay}
+        onCanPlay={() => {
+          setBuffering(false);
+          onReady?.();
+        }}
+        onWaiting={() => setBuffering(true)}
+        onSeeking={() => setBuffering(true)}
+        onSeeked={() => setBuffering(false)}
+        onPlay={() => {
+          handlePlay();
+          setBuffering(false);
+          onReady?.();
+        }}
         onPause={handlePause}
         onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
         onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
@@ -160,11 +177,21 @@ const CloudinaryVideoPlayer: React.FC<CloudinaryVideoPlayerProps> = ({
             setBuffered(v.buffered.end(v.buffered.length - 1));
           }
         }}
-        onEnded={() => setPlaying(false)}
+        onEnded={() => {
+          setPlaying(false);
+          setBuffering(false);
+        }}
       />
 
-      {/* Big center play button (paused only) */}
-      {!playing && (
+      {/* Buffering loading spinner */}
+      {buffering && (
+        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+          <div className="w-12 h-12 border-4 border-white/20 border-t-[#0086F0] rounded-full animate-spin" />
+        </div>
+      )}
+
+      {/* Big center play button (paused & not buffering only) */}
+      {!playing && !buffering && (
         <button
           onClick={togglePlay}
           aria-label="Play video"

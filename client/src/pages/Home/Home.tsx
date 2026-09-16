@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { API_BASE } from "../../config";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Pencil, ChevronUp, ChevronDown } from "lucide-react";
+import { ChevronUp, ChevronDown } from "lucide-react";
 import { lazy, Suspense } from "react";
 import Navbar from "../../components/Navbar";
 import Hero from "./Hero";
 import Footer from "../../components/Footer";
-import { useNavbarRightOffset } from "../../hooks/useNavbarRight";
 
 const HomeWork = lazy(() => import("./HomeWork"));
 const OurSolution = lazy(() => import("./OurSolution"));
@@ -56,6 +55,10 @@ export interface HomepageContent {
   reviews: Review[];
   faqs: FaqItem[];
   workVideos?: string[];
+  workPage?: {
+    title?: string;
+    videos?: string[];
+  };
   production?: {
     sectionSubtitle: string;
     title: string;
@@ -98,6 +101,10 @@ const DEFAULT_CONTENT: HomepageContent = {
     { question: "Do you offer revisions?", answer: "Yes. We include revision rounds to ensure the final content aligns with your brand, goals, and expectations." },
   ],
   workVideos: Array(12).fill("https://www.youtube.com/watch?v=bSl7z00Hnug"),
+  workPage: {
+    title: "Our Work",
+    videos: Array(12).fill("https://www.youtube.com/watch?v=bSl7z00Hnug"),
+  },
   production: {
     sectionSubtitle: "OUR PRODUCTION ECOSYSTEM",
     title: "One Production Partner, \n Endless Creative Possibilities...",
@@ -136,11 +143,10 @@ const DEFAULT_CONTENT: HomepageContent = {
 };
 
 const Home = ({ isAdminMode = false }: HomeProps) => {
-  const navbarRight = useNavbarRightOffset(isAdminMode);
   const [activeSection, setActiveSection] = useState<
     "hero" | "about" | "solution" | "production" | "reviews"
   >("hero");
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [, setIsTransitioning] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [content, setContent] = useState<HomepageContent>(DEFAULT_CONTENT);
@@ -234,35 +240,6 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
           return;
         }
         throw new Error("Failed to update hero");
-      }
-      const updated = await response.json();
-      setContent(updated);
-    } catch (err: any) {
-      alert(err.message);
-    }
-  };
-
-  const handleUpdateWorkVideos = async (workVideos: string[]) => {
-    const token = localStorage.getItem("adminToken");
-    try {
-      const response = await fetch(
-        `${API_BASE}/api/content/work-videos`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ workVideos }),
-        },
-      );
-      if (!response.ok) {
-        if (response.status === 401) {
-          localStorage.removeItem("adminToken");
-          navigate("/admin/signin");
-          return;
-        }
-        throw new Error("Failed to update work videos");
       }
       const updated = await response.json();
       setContent(updated);
@@ -751,24 +728,6 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
         </div>
       )}
 
-      {isAdminMode && (
-        <div className="fixed top-24 z-[100] flex flex-col items-end gap-2" style={{ right: navbarRight }}>
-          {/* Edit Work Videos — only on homework section when active and not scrolling/transitioning */}
-          {activeSection === "about" && !isTransitioning && (
-            <button
-              onClick={() => {
-                const el = document.getElementById("homework-edit-trigger");
-                if (el) el.click();
-              }}
-              className="mt-14 md:mt-0 p-2.5 bg-[#06102F]/90 hover:bg-[#0086F0]/80 border border-[#0086F0]/50 hover:border-[#0086F0] text-[#5ACFFE] hover:text-white rounded-full transition-all duration-200 cursor-pointer shadow-lg hover:shadow-[#0086F0]/30 backdrop-blur-md"
-              title="Edit Featured Work Section"
-            >
-              <Pencil className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-      )}
-
       {/* Section navigation arrows — sm/md devices only */}
       <div
         className={`fixed right-0 bottom-0 z-[90] flex flex-col lg:hidden ${
@@ -820,9 +779,10 @@ const Home = ({ isAdminMode = false }: HomeProps) => {
         <Suspense fallback={null}>
           <HomeWork
             onGoToSolution={transitionToSolution}
-            workVideos={content?.workVideos || []}
-            isAdminMode={isAdminMode}
-            onUpdateWorkVideos={handleUpdateWorkVideos}
+            workVideos={(content?.workPage?.videos && content.workPage.videos.length > 0
+              ? content.workPage.videos
+              : content?.workVideos || []
+            ).slice(0, 12)}
           />
         </Suspense>
 

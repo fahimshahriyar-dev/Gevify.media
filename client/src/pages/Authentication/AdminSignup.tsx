@@ -9,7 +9,12 @@ import {
   KeyRound,
   UserPlus,
 } from "lucide-react";
-import authBg from "../../assets/images/auth_bg.webp";
+import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
+
+const AUTH_BG_URL = optimizeCloudinaryUrl(
+  "https://res.cloudinary.com/dsmkxcczo/image/upload/v1789493045/auth_bg_njsclx.png",
+  1600,
+);
 
 const AdminSignup: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -62,9 +67,13 @@ const AdminSignup: React.FC = () => {
   return (
     <div className="relative min-h-screen w-screen flex items-center justify-center bg-[#06102F] overflow-hidden font-sans py-12">
       {/* Background image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center pointer-events-none"
-        style={{ backgroundImage: `url(${authBg})` }}
+      <img
+        src={AUTH_BG_URL}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none"
       />
       {/* Background glow graphics */}
       <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#0086F0]/20 rounded-full blur-[120px] pointer-events-none animate-pulse duration-[6s]" />

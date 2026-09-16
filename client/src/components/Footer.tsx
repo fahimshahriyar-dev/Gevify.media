@@ -4,7 +4,10 @@ import { Link } from "react-router-dom";
 import EditModalOverlay from "./EditModalOverlay";
 import PhoneNumberInput, { isValidWhatsAppNumber } from "./PhoneNumberInput";
 import { Pencil, Image as ImageIcon } from "lucide-react";
-import footerBg from "../assets/images/footer_bg.webp";
+const FOOTER_BG_URL = optimizeCloudinaryUrl(
+  "https://res.cloudinary.com/dsmkxcczo/image/upload/v1789493053/footer_bg_izxmf6.webp",
+  1600,
+);
 import { optimizeCloudinaryUrl } from "../utils/cloudinary";
 import { updateFavicon } from "../utils/favicon";
 
@@ -212,18 +215,18 @@ const Footer = ({ isAdminMode = false }: FooterProps) => {
   };
 
   return (
-    <footer
-      className="relative text-white overflow-hidden bg-cover bg-center lg:bg-top border-t-0 border-none"
-      style={{
-        backgroundImage: `url(${footerBg})`,
-        backgroundSize: "cover",
-        backgroundRepeat: "no-repeat",
-        borderTop: "none",
-        border: "none",
-      }}
-    >
+    <footer className="relative text-white overflow-hidden border-t-0 border-none">
+      {/* Background Image */}
+      <img
+        src={FOOTER_BG_URL}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full object-cover object-center lg:object-top pointer-events-none select-none z-0"
+      />
       {/* Background dark overlay */}
-      <div className="absolute inset-0 bg-black/85" />
+      <div className="absolute inset-0 bg-black/85 z-0" />
 
       {/* Edit Footer Button */}
       {isAdminMode && (

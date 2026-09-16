@@ -31,6 +31,22 @@ function getYouTubeThumbnail(url: string): string | null {
   return `https://img.youtube.com/vi/${id}/mqdefault.jpg`;
 }
 
+/**
+ * Returns a compressed YouTube thumbnail for grid cards (320x180, smaller payload).
+ * mqdefault is natively 320×180 which is already the right size for grid thumbnails.
+ * For Cloudinary videos we inject q_auto,w_320 to reduce the image size.
+ */
+function getCompressedThumbnail(url: string): string | null {
+  if (!url) return null;
+  if (isCloudinaryVideoUrl(url)) {
+    // Cloudinary: force 320px wide, auto quality, JPEG frame
+    const raw = getCloudinaryVideoThumbnail(url, 320);
+    return raw || null;
+  }
+  // YouTube: mqdefault is already a compressed 320×180 JPEG
+  return getYouTubeThumbnail(url);
+}
+
 function getEmbedUrl(url: string): string {
   if (!url) return "";
   let videoId = "";
@@ -58,6 +74,7 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
   const [workVideos, setWorkVideos] = useState<string[]>([]);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [isVideoLoading, setIsVideoLoading] = useState(true);
   const [activeEdit, setActiveEdit] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editTitle, setEditTitle] = useState("");
@@ -227,13 +244,12 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
               {workVideos.length > 0 &&
                 pageVideos.map((url, i) => {
                   const globalIdx = pageStart + i;
-                  const thumb = isCloudinaryVideoUrl(url)
-                    ? getCloudinaryVideoThumbnail(url)
-                    : getYouTubeThumbnail(url);
+                  const thumb = getCompressedThumbnail(url);
                   return (
                     <button
                       key={globalIdx}
                       onClick={() => {
+                        setIsVideoLoading(true);
                         setActiveIndex(globalIdx);
                         setIsPopupOpen(true);
                       }}
@@ -243,6 +259,8 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
                         <img
                           src={thumb}
                           alt={`Work ${globalIdx + 1}`}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                       ) : (
@@ -367,24 +385,24 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
                 </div>
               ))}
             </div>
+
+            <div className="flex justify-end gap-3 pt-4 border-t border-zinc-900">
+              <button
+                type="button"
+                onClick={closeEdit}
+                className="px-5 py-2.5 rounded-full border border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-white text-sm font-semibold transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={saving}
+                className="px-6 py-2.5 rounded-full bg-[#0086F0] hover:bg-[#0073ce] text-white text-sm font-semibold transition-colors disabled:opacity-50 cursor-pointer"
+              >
+                {saving ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
           </form>
-          <div className="flex justify-end gap-3 pt-4 border-t border-zinc-900">
-            <button
-              type="button"
-              onClick={closeEdit}
-              className="px-5 py-2.5 rounded-full border border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-white text-sm font-semibold transition-colors cursor-pointer"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              onClick={handleSave}
-              disabled={saving}
-              className="px-6 py-2.5 rounded-full bg-[#0086F0] hover:bg-[#0073ce] text-white text-sm font-semibold transition-colors disabled:opacity-50 cursor-pointer"
-            >
-              {saving ? "Saving..." : "Save Changes"}
-            </button>
-          </div>
         </div>
       </EditModalOverlay>
 
@@ -414,6 +432,11 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
               ✕
             </button>
             <div className="aspect-video w-full bg-black relative">
+              {isVideoLoading && (
+                <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 backdrop-blur-sm pointer-events-none">
+                  <div className="w-12 h-12 border-4 border-white/20 border-t-[#0086F0] rounded-full animate-spin" />
+                </div>
+              )}
               {(() => {
                 const url = workVideos[activeIndex] || "";
                 if (isCloudinaryVideoUrl(url)) {
@@ -422,12 +445,19 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
                       key={url}
                       src={url}
                       poster={getCloudinaryVideoThumbnail(url)}
+                      onReady={() => setIsVideoLoading(false)}
                     />
                   );
                 }
                 const ytId = extractYouTubeId(url);
                 if (ytId) {
-                  return <YouTubePlayer key={url} videoId={ytId} />;
+                  return (
+                    <YouTubePlayer
+                      key={url}
+                      videoId={ytId}
+                      onReady={() => setIsVideoLoading(false)}
+                    />
+                  );
                 }
                 return (
                   <iframe
@@ -436,6 +466,7 @@ const Work = ({ isAdminMode = false }: WorkProps) => {
                     className="w-full h-full border-0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
+                    onLoad={() => setIsVideoLoading(false)}
                   />
                 );
               })()}

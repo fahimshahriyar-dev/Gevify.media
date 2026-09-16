@@ -9,8 +9,12 @@ import PhoneNumberInput, {
 import { Mail, Pencil, ChevronUp } from "lucide-react";
 import { gsap } from "gsap";
 import { useNavbarRightOffset } from "../hooks/useNavbarRight";
-import contactBg from "../assets/images/contact_bg.webp";
 import { optimizeCloudinaryUrl } from "../utils/cloudinary";
+
+const CONTACT_BG_URL = optimizeCloudinaryUrl(
+  "https://res.cloudinary.com/dsmkxcczo/image/upload/v1789493050/contact_bg_hzuoqd.webp",
+  1600,
+);
 import { updateFavicon } from "../utils/favicon";
 
 interface ContactProps {
@@ -341,9 +345,13 @@ const Contact: React.FC<ContactProps> = ({ isAdminMode = false }) => {
   return (
     <div className="relative w-full h-mobile-screen bg-[#06102F] overflow-hidden select-none text-white">
       {/* Background image */}
-      <div
-        className="absolute inset-0 z-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${contactBg})` }}
+      <img
+        src={CONTACT_BG_URL}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        aria-hidden="true"
+        className="absolute inset-0 z-0 w-full h-full object-cover object-center pointer-events-none select-none"
       />
       <Navbar />
 
