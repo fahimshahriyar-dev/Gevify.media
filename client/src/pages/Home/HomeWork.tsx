@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
-const Slider = lazy(() => import("../../components/animations/Slider"));
+const CssSlider = lazy(() => import("../../components/animations/CssSlider"));
 
 interface HomeWorkProps {
   onGoToSolution?: () => void;
@@ -34,7 +34,7 @@ const HomeWork = ({
       `}</style>
 
       <Suspense fallback={null}>
-        <Slider workVideos={workVideos} />
+        <CssSlider workVideos={workVideos} />
       </Suspense>
 
       {/* Navigation links at bottom corners - hidden on sm & md, visible on lg */}
