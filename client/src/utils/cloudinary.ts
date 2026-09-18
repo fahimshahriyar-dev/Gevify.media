@@ -46,11 +46,11 @@ export const getCloudinaryVideoThumbnail = (
  * If the URL is not a Cloudinary video URL, it returns the original URL.
  * 
  * @param url The original Cloudinary video URL
- * @param width Target video width (defaults to 1280 for web streaming)
+ * @param width Target video width (defaults to 1920 for web streaming)
  */
 export const optimizeCloudinaryVideoUrl = (
   url?: string | null,
-  width = 1280,
+  width = 1920,
 ): string => {
   if (!url) return "";
   if (isCloudinaryVideoUrl(url)) {
